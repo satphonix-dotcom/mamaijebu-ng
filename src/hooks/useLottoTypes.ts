@@ -59,6 +59,38 @@ export function useLottoTypes() {
     }
   };
 
+  const updateLottoType = async (id: string, typeData: any) => {
+    try {
+      const { data, error } = await supabase
+        .from('lotto_types')
+        .update(typeData)
+        .eq('id', id)
+        .select() as { data: LottoType[] | null, error: any };
+      
+      if (error) throw error;
+      
+      // Update the local state with the updated type
+      setLottoTypes(lottoTypes.map(type => 
+        type.id === id ? { ...type, ...data?.[0] } : type
+      ));
+      
+      toast({
+        title: 'Success',
+        description: 'Lottery type updated successfully',
+      });
+      
+      return data;
+    } catch (error) {
+      console.error('Error updating lottery type:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to update lottery type. Please try again.',
+        variant: 'destructive',
+      });
+      throw error;
+    }
+  };
+
   useEffect(() => {
     fetchLottoTypes();
   }, []);
@@ -67,6 +99,7 @@ export function useLottoTypes() {
     lottoTypes,
     loading,
     fetchLottoTypes,
-    addLottoType
+    addLottoType,
+    updateLottoType
   };
 }

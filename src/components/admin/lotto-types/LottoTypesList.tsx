@@ -2,13 +2,15 @@
 import { TableCell, TableBody, TableHead, TableHeader, TableRow, Table } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LottoType } from "@/types/supabase";
+import { EditLottoTypeDialog } from "./EditLottoTypeDialog";
 
 interface LottoTypesListProps {
   lottoTypes: LottoType[];
   loading: boolean;
+  onUpdateType: (id: string, typeData: any) => Promise<any>;
 }
 
-export function LottoTypesList({ lottoTypes, loading }: LottoTypesListProps) {
+export function LottoTypesList({ lottoTypes, loading, onUpdateType }: LottoTypesListProps) {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -37,6 +39,7 @@ export function LottoTypesList({ lottoTypes, loading }: LottoTypesListProps) {
               <TableHead>Name</TableHead>
               <TableHead>Description</TableHead>
               <TableHead>Configuration</TableHead>
+              <TableHead className="w-[80px]">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -61,6 +64,9 @@ export function LottoTypesList({ lottoTypes, loading }: LottoTypesListProps) {
                   ) : (
                     <span className="text-muted-foreground">No configuration</span>
                   )}
+                </TableCell>
+                <TableCell>
+                  <EditLottoTypeDialog lottoType={type} onUpdateType={onUpdateType} />
                 </TableCell>
               </TableRow>
             ))}

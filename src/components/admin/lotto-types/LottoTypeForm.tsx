@@ -1,5 +1,5 @@
 
-import { FormEvent, useState } from "react";
+import { FormEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -27,6 +27,8 @@ interface LottoTypeFormProps {
   setExtraNumbersMin: (value: string) => void;
   extraNumbersMax: string;
   setExtraNumbersMax: (value: string) => void;
+  formTitle?: string;
+  submitButtonText?: string;
 }
 
 export function LottoTypeForm({
@@ -49,11 +51,13 @@ export function LottoTypeForm({
   setExtraNumbersMin,
   extraNumbersMax,
   setExtraNumbersMax,
+  formTitle = "Add New Lottery Type",
+  submitButtonText = "Add Type",
 }: LottoTypeFormProps) {
   return (
     <DialogContent className="sm:max-w-[625px]">
       <DialogHeader>
-        <DialogTitle>Add New Lottery Type</DialogTitle>
+        <DialogTitle>{formTitle}</DialogTitle>
       </DialogHeader>
       <form onSubmit={onSubmit}>
         <div className="grid gap-4 py-4">
@@ -180,7 +184,7 @@ export function LottoTypeForm({
         </div>
 
         <DialogFooter>
-          <Button type="submit">Add Type</Button>
+          <Button type="submit">{submitButtonText}</Button>
         </DialogFooter>
       </form>
     </DialogContent>
