@@ -18,6 +18,7 @@ interface SearchResult {
   game_name: string;
   draw_date: string;
   numbers: number[];
+  draw_number?: string; // Keep this as optional since it might not be in DB
   matched_positions?: number[];
 }
 
@@ -76,17 +77,21 @@ export function useSearchResults() {
         }
         
         return false;
-      }).map(draw => {
+      }).map((draw, index) => {
         // Find the positions where the number matches
         const matchedPositions = draw.numbers
           .map((num: number, index: number) => num === params.number ? index : -1)
           .filter((pos: number) => pos !== -1);
+        
+        // Generate a draw number based on the index or date if not available in DB
+        const drawNumber = `${index + 1}`; // Simple sequential numbering
         
         return {
           id: draw.id,
           game_name: draw.lotto_games.name,
           draw_date: draw.draw_date,
           numbers: draw.numbers,
+          draw_number: drawNumber, // Add generated draw number
           matched_positions: matchedPositions
         };
       });
