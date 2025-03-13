@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useToast } from '@/components/ui/use-toast';
 import { Button } from '@/components/ui/button';
@@ -11,8 +10,13 @@ import { AdminLayout } from '@/components/AdminLayout';
 import { supabase } from '@/integrations/supabase/client';
 import { LottoGame, LottoDraw } from '@/types/supabase';
 
+// Define an extended type that includes the lotto_games relation
+type DrawWithGame = LottoDraw & {
+  lotto_games?: LottoGame;
+};
+
 export default function Draws() {
-  const [draws, setDraws] = useState<LottoDraw[]>([]);
+  const [draws, setDraws] = useState<DrawWithGame[]>([]);
   const [games, setGames] = useState<LottoGame[]>([]);
   const [loading, setLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -115,7 +119,7 @@ export default function Draws() {
       
       if (error) throw error;
       
-      setDraws([...(data as any), ...draws]);
+      setDraws([...(data as DrawWithGame[]), ...draws]);
       setIsDialogOpen(false);
       setSelectedGame(null);
       setDrawDate('');
@@ -224,7 +228,7 @@ export default function Draws() {
               <Card key={draw.id}>
                 <CardHeader>
                   <div className="flex justify-between items-center">
-                    <CardTitle>{(draw.lotto_games as any)?.name || 'Unknown Game'}</CardTitle>
+                    <CardTitle>{draw.lotto_games?.name || 'Unknown Game'}</CardTitle>
                     <span className="text-sm font-medium">
                       {new Date(draw.draw_date).toLocaleDateString()}
                     </span>
