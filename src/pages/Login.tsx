@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,7 +14,12 @@ export default function Login() {
   const [isLoading, setIsLoading] = useState(false);
   const { signIn, signUp, user } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const { toast } = useToast();
+  
+  // Get the tab from URL search params
+  const searchParams = new URLSearchParams(location.search);
+  const defaultTab = searchParams.get('tab') === 'signup' ? 'signup' : 'signin';
 
   // Redirect if user is already logged in
   useEffect(() => {
@@ -75,7 +80,7 @@ export default function Login() {
           <CardTitle className="text-2xl text-center">Welcome to LottoGaze</CardTitle>
           <CardDescription className="text-center">Sign in to your account or create a new one</CardDescription>
         </CardHeader>
-        <Tabs defaultValue="signin" className="w-full">
+        <Tabs defaultValue={defaultTab} className="w-full">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="signin">Sign In</TabsTrigger>
             <TabsTrigger value="signup">Sign Up</TabsTrigger>

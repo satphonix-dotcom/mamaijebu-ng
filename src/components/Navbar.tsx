@@ -69,11 +69,18 @@ export const Navbar = () => {
                 Sign Out
               </Button>
             ) : (
-              <Link to="/login">
-                <Button variant="default" className="bg-primary-400 hover:bg-primary-500">
-                  Sign In
-                </Button>
-              </Link>
+              <div className="flex space-x-2">
+                <Link to="/login">
+                  <Button variant="default" className="bg-primary-400 hover:bg-primary-500">
+                    Sign In
+                  </Button>
+                </Link>
+                <Link to="/login?tab=signup">
+                  <Button variant="outline">
+                    Sign Up
+                  </Button>
+                </Link>
+              </div>
             )}
           </div>
         </div>
