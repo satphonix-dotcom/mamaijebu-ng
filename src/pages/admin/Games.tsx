@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useToast } from '@/components/ui/use-toast';
 import { Button } from '@/components/ui/button';
@@ -10,19 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { AdminLayout } from '@/components/AdminLayout';
 import { supabase } from '@/integrations/supabase/client';
-import { LottoGame } from '@/types/supabase';
-
-type Country = {
-  id: string;
-  name: string;
-  code: string;
-};
-
-type LottoType = {
-  id: string;
-  name: string;
-  description: string;
-};
+import { LottoGame, Country, LottoType } from '@/types/supabase';
 
 export default function Games() {
   const [games, setGames] = useState<LottoGame[]>([]);
@@ -67,7 +54,7 @@ export default function Games() {
       const { data: countriesData, error: countriesError } = await supabase
         .from('countries')
         .select('*')
-        .order('name', { ascending: true });
+        .order('name', { ascending: true }) as { data: Country[] | null, error: any };
       
       if (countriesError) throw countriesError;
       setCountries(countriesData || []);
@@ -76,7 +63,7 @@ export default function Games() {
       const { data: typesData, error: typesError } = await supabase
         .from('lotto_types')
         .select('*')
-        .order('name', { ascending: true });
+        .order('name', { ascending: true }) as { data: LottoType[] | null, error: any };
       
       if (typesError) throw typesError;
       setLottoTypes(typesData || []);

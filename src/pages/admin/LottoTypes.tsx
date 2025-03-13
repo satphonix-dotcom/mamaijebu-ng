@@ -10,13 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { AdminLayout } from '@/components/AdminLayout';
 import { supabase } from '@/integrations/supabase/client';
-
-type LottoType = {
-  id: string;
-  name: string;
-  description: string;
-  created_at: string;
-};
+import { LottoType } from '@/types/supabase';
 
 export default function LottoTypes() {
   const [lottoTypes, setLottoTypes] = useState<LottoType[]>([]);
@@ -34,10 +28,11 @@ export default function LottoTypes() {
   const fetchLottoTypes = async () => {
     try {
       setLoading(true);
+      // Using the any type to work around TypeScript limitations until the Supabase types are updated
       const { data, error } = await supabase
         .from('lotto_types')
         .select('*')
-        .order('name', { ascending: true });
+        .order('name', { ascending: true }) as { data: LottoType[] | null, error: any };
       
       if (error) throw error;
       setLottoTypes(data || []);
@@ -57,17 +52,18 @@ export default function LottoTypes() {
     e.preventDefault();
     
     try {
+      // Using the any type to work around TypeScript limitations until the Supabase types are updated
       const { data, error } = await supabase
         .from('lotto_types')
         .insert([{
           name: typeName,
           description: typeDescription,
         }])
-        .select();
+        .select() as { data: LottoType[] | null, error: any };
       
       if (error) throw error;
       
-      setLottoTypes([...(data as LottoType[]), ...lottoTypes]);
+      setLottoTypes([...(data || []), ...lottoTypes]);
       setIsDialogOpen(false);
       setTypeName('');
       setTypeDescription('');

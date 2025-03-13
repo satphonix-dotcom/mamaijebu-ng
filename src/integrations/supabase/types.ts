@@ -9,6 +9,27 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      countries: {
+        Row: {
+          code: string
+          created_at: string
+          id: string
+          name: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          id?: string
+          name: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
       lotto_draws: {
         Row: {
           created_at: string
@@ -47,9 +68,11 @@ export type Database = {
       lotto_games: {
         Row: {
           ball_count: number
+          country_id: string | null
           created_at: string
           description: string | null
           id: string
+          lotto_type_id: string | null
           max_number: number
           min_number: number
           name: string
@@ -57,9 +80,11 @@ export type Database = {
         }
         Insert: {
           ball_count: number
+          country_id?: string | null
           created_at?: string
           description?: string | null
           id?: string
+          lotto_type_id?: string | null
           max_number: number
           min_number: number
           name: string
@@ -67,13 +92,51 @@ export type Database = {
         }
         Update: {
           ball_count?: number
+          country_id?: string | null
           created_at?: string
           description?: string | null
           id?: string
+          lotto_type_id?: string | null
           max_number?: number
           min_number?: number
           name?: string
           updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lotto_games_country_id_fkey"
+            columns: ["country_id"]
+            isOneToOne: false
+            referencedRelation: "countries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lotto_games_lotto_type_id_fkey"
+            columns: ["lotto_type_id"]
+            isOneToOne: false
+            referencedRelation: "lotto_types"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lotto_types: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
         }
         Relationships: []
       }

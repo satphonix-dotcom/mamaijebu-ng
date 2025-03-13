@@ -9,13 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { AdminLayout } from '@/components/AdminLayout';
 import { supabase } from '@/integrations/supabase/client';
-
-type Country = {
-  id: string;
-  name: string;
-  code: string;
-  created_at: string;
-};
+import { Country } from '@/types/supabase';
 
 export default function Countries() {
   const [countries, setCountries] = useState<Country[]>([]);
@@ -33,10 +27,11 @@ export default function Countries() {
   const fetchCountries = async () => {
     try {
       setLoading(true);
+      // Using the any type to work around TypeScript limitations until the Supabase types are updated
       const { data, error } = await supabase
         .from('countries')
         .select('*')
-        .order('name', { ascending: true });
+        .order('name', { ascending: true }) as { data: Country[] | null, error: any };
       
       if (error) throw error;
       setCountries(data || []);
@@ -56,17 +51,18 @@ export default function Countries() {
     e.preventDefault();
     
     try {
+      // Using the any type to work around TypeScript limitations until the Supabase types are updated
       const { data, error } = await supabase
         .from('countries')
         .insert([{
           name: countryName,
           code: countryCode,
         }])
-        .select();
+        .select() as { data: Country[] | null, error: any };
       
       if (error) throw error;
       
-      setCountries([...(data as Country[]), ...countries]);
+      setCountries([...(data || []), ...countries]);
       setIsDialogOpen(false);
       setCountryName('');
       setCountryCode('');
