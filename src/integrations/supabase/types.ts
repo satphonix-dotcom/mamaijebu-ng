@@ -9,7 +9,98 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      lotto_draws: {
+        Row: {
+          created_at: string
+          draw_date: string
+          game_id: string
+          id: string
+          numbers: number[]
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          draw_date: string
+          game_id: string
+          id?: string
+          numbers: number[]
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          draw_date?: string
+          game_id?: string
+          id?: string
+          numbers?: number[]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lotto_draws_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "lotto_games"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lotto_games: {
+        Row: {
+          ball_count: number
+          created_at: string
+          description: string | null
+          id: string
+          max_number: number
+          min_number: number
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          ball_count: number
+          created_at?: string
+          description?: string | null
+          id?: string
+          max_number: number
+          min_number: number
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          ball_count?: number
+          created_at?: string
+          description?: string | null
+          id?: string
+          max_number?: number
+          min_number?: number
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          is_admin: boolean | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id: string
+          is_admin?: boolean | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          is_admin?: boolean | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
