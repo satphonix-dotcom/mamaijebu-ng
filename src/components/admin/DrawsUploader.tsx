@@ -68,13 +68,14 @@ export const DrawsUploader = ({ games, onSuccess }: DrawsUploaderProps) => {
           continue;
         }
 
-        // Insert the draw
+        // Insert the draw with draw number
         const { error } = await supabase
           .from('lotto_draws')
           .insert({
             game_id: selectedGame,
             draw_date: draw.drawDate,
-            numbers: draw.numbers
+            numbers: draw.numbers,
+            draw_number: draw.drawNumber  // Store the draw number
           });
 
         if (error) {

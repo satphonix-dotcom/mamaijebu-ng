@@ -38,6 +38,7 @@ export function useSearchResults() {
         .select(`
           id,
           draw_date,
+          draw_number,
           numbers,
           lotto_games!inner(id, name, lotto_type_id)
         `);
@@ -83,15 +84,12 @@ export function useSearchResults() {
           .map((num: number, index: number) => num === params.number ? index : -1)
           .filter((pos: number) => pos !== -1);
         
-        // Generate a draw number based on the index or date if not available in DB
-        const drawNumber = `${index + 1}`; // Simple sequential numbering
-        
         return {
           id: draw.id,
           game_name: draw.lotto_games.name,
           draw_date: draw.draw_date,
           numbers: draw.numbers,
-          draw_number: drawNumber, // Add generated draw number
+          draw_number: draw.draw_number || `${index + 1}`, // Use stored draw_number or fallback to index
           matched_positions: matchedPositions
         };
       });
