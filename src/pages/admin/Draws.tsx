@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useToast } from '@/components/ui/use-toast';
 import { Button } from '@/components/ui/button';
@@ -9,6 +10,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { AdminLayout } from '@/components/AdminLayout';
 import { supabase } from '@/integrations/supabase/client';
 import { LottoGame, LottoDraw } from '@/types/supabase';
+import { DrawsUploader } from '@/components/admin/DrawsUploader';
+import { Textarea } from '@/components/ui/textarea';
 
 // Define an extended type that includes the lotto_games relation
 type DrawWithGame = LottoDraw & {
@@ -213,6 +216,12 @@ export default function Draws() {
             </DialogContent>
           </Dialog>
         </div>
+
+        {/* Add the DrawsUploader component */}
+        <DrawsUploader 
+          games={games} 
+          onSuccess={fetchData} 
+        />
 
         {loading ? (
           <div className="flex justify-center items-center h-64">
