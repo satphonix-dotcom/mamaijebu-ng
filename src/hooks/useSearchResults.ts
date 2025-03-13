@@ -18,7 +18,6 @@ interface SearchResult {
   game_name: string;
   draw_date: string;
   numbers: number[];
-  draw_number?: string;
   matched_positions?: number[];
 }
 
@@ -39,7 +38,6 @@ export function useSearchResults() {
           id,
           draw_date,
           numbers,
-          draw_number,
           lotto_games!inner(id, name, lotto_type_id)
         `);
       
@@ -89,7 +87,6 @@ export function useSearchResults() {
           game_name: draw.lotto_games.name,
           draw_date: draw.draw_date,
           numbers: draw.numbers,
-          draw_number: draw.draw_number,
           matched_positions: matchedPositions
         };
       });

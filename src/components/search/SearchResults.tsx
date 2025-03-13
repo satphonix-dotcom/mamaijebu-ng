@@ -17,7 +17,6 @@ interface SearchResult {
   game_name: string;
   draw_date: string;
   numbers: number[];
-  draw_number?: string;
   matched_positions?: number[];
 }
 
@@ -51,7 +50,6 @@ export function SearchResults({ results, isLoading }: SearchResultsProps) {
           <TableRow>
             <TableHead>Game</TableHead>
             <TableHead>Draw Date</TableHead>
-            <TableHead>Draw #</TableHead>
             <TableHead>Numbers</TableHead>
           </TableRow>
         </TableHeader>
@@ -60,7 +58,6 @@ export function SearchResults({ results, isLoading }: SearchResultsProps) {
             <TableRow key={result.id}>
               <TableCell className="font-medium">{result.game_name}</TableCell>
               <TableCell>{format(new Date(result.draw_date), 'dd/MM/yyyy')}</TableCell>
-              <TableCell>{result.draw_number || 'N/A'}</TableCell>
               <TableCell>
                 <div className="flex flex-wrap gap-1">
                   {result.numbers.map((num, index) => {
