@@ -14,6 +14,7 @@ import Draws from "./pages/admin/Draws";
 import Countries from "./pages/admin/Countries";
 import LottoTypes from "./pages/admin/LottoTypes";
 import AdminDashboard from "./pages/admin/Dashboard";
+import Search from "./pages/Search";
 
 const queryClient = new QueryClient();
 
@@ -28,6 +29,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/login" element={<Login />} />
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/search" element={<Search />} />
             <Route path="/admin/dashboard" element={<AdminDashboard />} />
             <Route path="/admin/games" element={<Games />} />
             <Route path="/admin/draws" element={<Draws />} />

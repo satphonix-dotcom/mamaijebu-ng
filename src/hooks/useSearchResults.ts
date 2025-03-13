@@ -3,11 +3,14 @@ import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
 
+// Define the search logic type
+type SearchLogicType = 'both' | 'success' | 'machine' | 'position';
+
 interface SearchParams {
   number: number;
   gameTypeId: string | null;
   gameId: string | null;
-  searchLogic: 'both' | 'success' | 'machine' | 'position';
+  searchLogic: SearchLogicType;
 }
 
 interface SearchResult {
@@ -36,6 +39,7 @@ export function useSearchResults() {
           id,
           draw_date,
           numbers,
+          draw_number,
           lotto_games!inner(id, name, lotto_type_id)
         `);
       
@@ -85,6 +89,7 @@ export function useSearchResults() {
           game_name: draw.lotto_games.name,
           draw_date: draw.draw_date,
           numbers: draw.numbers,
+          draw_number: draw.draw_number,
           matched_positions: matchedPositions
         };
       });

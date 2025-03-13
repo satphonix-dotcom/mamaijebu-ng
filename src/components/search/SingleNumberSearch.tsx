@@ -16,11 +16,14 @@ import { useLottoTypes } from '@/hooks/useLottoTypes';
 import { supabase } from '@/integrations/supabase/client';
 import { LottoGame } from '@/types/supabase';
 
+// Define a type for the search logic options
+type SearchLogicType = 'both' | 'success' | 'machine' | 'position';
+
 export function SingleNumberSearch() {
   const [number, setNumber] = useState('');
   const [gameType, setGameType] = useState('all');
   const [specificGame, setSpecificGame] = useState('');
-  const [searchLogic, setSearchLogic] = useState('both');
+  const [searchLogic, setSearchLogic] = useState<SearchLogicType>('both');
   const [games, setGames] = useState<LottoGame[]>([]);
   const [loading, setLoading] = useState(false);
   const [gamesByType, setGamesByType] = useState<{[key: string]: LottoGame[]}>({});
@@ -157,7 +160,9 @@ export function SingleNumberSearch() {
         {/* Search logic selector */}
         <div className="space-y-2">
           <Label htmlFor="searchLogic">Search Logic</Label>
-          <Select value={searchLogic} onValueChange={setSearchLogic}>
+          <Select 
+            value={searchLogic} 
+            onValueChange={(value: SearchLogicType) => setSearchLogic(value)}>
             <SelectTrigger id="searchLogic">
               <SelectValue placeholder="Select search logic" />
             </SelectTrigger>
