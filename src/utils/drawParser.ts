@@ -1,5 +1,5 @@
 
-import { LottoGame } from '@/types/supabase';
+import { LottoGame, LottoType } from '@/types/supabase';
 
 export interface Draw {
   drawNumber: string;
@@ -76,11 +76,11 @@ export const formatDate = (dateStr: string): string => {
 /**
  * Validate a draw against game rules
  */
-export const validateDraw = (draw: Draw, game: LottoGame): { valid: boolean; errors: string[] } => {
+export const validateDraw = (draw: Draw, game: LottoGame & { lotto_type?: LottoType }): { valid: boolean; errors: string[] } => {
   const errors: string[] = [];
   
   // Get the lottery type configuration if available
-  const lottoTypeConfig = game.lotto_types?.configuration;
+  const lottoTypeConfig = game.lotto_type?.configuration;
   
   if (lottoTypeConfig && lottoTypeConfig.has_multiple_sets) {
     // For games with multiple number sets like EuroMillions

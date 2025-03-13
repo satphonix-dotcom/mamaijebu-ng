@@ -121,18 +121,21 @@ export type Database = {
       }
       lotto_types: {
         Row: {
+          configuration: Json | null
           created_at: string
           description: string | null
           id: string
           name: string
         }
         Insert: {
+          configuration?: Json | null
           created_at?: string
           description?: string | null
           id?: string
           name: string
         }
         Update: {
+          configuration?: Json | null
           created_at?: string
           description?: string | null
           id?: string

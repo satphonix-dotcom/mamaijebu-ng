@@ -9,7 +9,21 @@ export type Profile = Database['public']['Tables']['profiles']['Row'];
 export type LottoGame = Database['public']['Tables']['lotto_games']['Row'];
 export type LottoDraw = Database['public']['Tables']['lotto_draws']['Row'];
 export type Country = Database['public']['Tables']['countries']['Row'];
-export type LottoType = Database['public']['Tables']['lotto_types']['Row'];
+export type LottoType = Database['public']['Tables']['lotto_types']['Row'] & {
+  configuration?: {
+    has_multiple_sets: boolean;
+    main_numbers: {
+      count: number;
+      min: number;
+      max: number;
+    };
+    extra_numbers?: {
+      count: number;
+      min: number;
+      max: number;
+    };
+  };
+};
 
 // Define insert types
 export type ProfileInsert = Database['public']['Tables']['profiles']['Insert'];

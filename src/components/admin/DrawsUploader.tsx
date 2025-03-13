@@ -4,13 +4,13 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/components/ui/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { LottoGame } from '@/types/supabase';
+import { LottoGame, LottoType } from '@/types/supabase';
 import { GameSelector } from './draws/GameSelector';
 import { DrawDataInput } from './draws/DrawDataInput';
 import { parseDraws, validateDraw } from '@/utils/drawParser';
 
 interface DrawsUploaderProps {
-  games: LottoGame[];
+  games: (LottoGame & { lotto_type?: LottoType })[];
   onSuccess: () => void;
 }
 

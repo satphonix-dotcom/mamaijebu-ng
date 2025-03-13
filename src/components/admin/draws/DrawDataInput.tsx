@@ -11,7 +11,7 @@ interface DrawDataInputProps {
 export const DrawDataInput = ({ value, onChange }: DrawDataInputProps) => {
   return (
     <div className="space-y-4">
-      <Alert variant="outline" className="bg-muted/50">
+      <Alert className="bg-muted/50">
         <Info className="h-4 w-4" />
         <AlertDescription>
           Format your draws using this pattern:

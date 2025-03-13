@@ -30,8 +30,8 @@ export default function Games() {
         .from('lotto_games')
         .select(`
           *,
-          countries (id, name, code),
-          lotto_types (id, name, description)
+          countries (*),
+          lotto_type:lotto_type_id (*)
         `)
         .order('name', { ascending: true });
       
