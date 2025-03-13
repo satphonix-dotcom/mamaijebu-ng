@@ -8,10 +8,12 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
+import Dashboard from "./pages/Dashboard";
 import Games from "./pages/admin/Games";
 import Draws from "./pages/admin/Draws";
 import Countries from "./pages/admin/Countries";
 import LottoTypes from "./pages/admin/LottoTypes";
+import AdminDashboard from "./pages/admin/Dashboard";
 
 const queryClient = new QueryClient();
 
@@ -25,6 +27,8 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/admin/dashboard" element={<AdminDashboard />} />
             <Route path="/admin/games" element={<Games />} />
             <Route path="/admin/draws" element={<Draws />} />
             <Route path="/admin/countries" element={<Countries />} />

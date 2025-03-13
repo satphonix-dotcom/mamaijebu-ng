@@ -42,8 +42,15 @@ export const Navbar = () => {
           </div>
           <div className="hidden lg:flex items-center space-x-4">
             <Link to="/">
-              <Button variant="ghost">Dashboard</Button>
+              <Button variant="ghost">Home</Button>
             </Link>
+            
+            {user && (
+              <Link to="/dashboard">
+                <Button variant="ghost">Dashboard</Button>
+              </Link>
+            )}
+            
             <Link to="/search">
               <Button variant="ghost">Search</Button>
             </Link>
@@ -52,7 +59,7 @@ export const Navbar = () => {
             </Link>
             
             {isAdmin && (
-              <Link to="/admin/games">
+              <Link to="/admin/dashboard">
                 <Button variant="ghost">Admin</Button>
               </Link>
             )}
