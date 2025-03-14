@@ -1,5 +1,7 @@
 
 import React from 'react';
+import { useAuth } from '@/contexts/AuthContext';
+import { PremiumRequired } from './PremiumRequired';
 import {
   SingleNumberTabContent,
   PatternNumberTabContent,
@@ -17,7 +19,20 @@ interface SearchTabContentProps {
   activeTab: string;
 }
 
+// Define which tabs require premium membership
+const premiumTabs = ['single', 'pattern', 'onerow', 'tworow', 'threerow', 'lapping', 'knocking', 'compare'];
+
 export function SearchTabContent({ activeTab }: SearchTabContentProps) {
+  const { profile } = useAuth();
+  const isPremiumMember = profile?.is_premium || false;
+  
+  // Check if the active tab requires premium and user is not premium
+  const requiresPremium = premiumTabs.includes(activeTab) && !isPremiumMember;
+  
+  if (requiresPremium) {
+    return <PremiumRequired />;
+  }
+  
   switch (activeTab) {
     case "single":
       return <SingleNumberTabContent />;

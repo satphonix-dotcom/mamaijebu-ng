@@ -13,6 +13,8 @@ type AuthContextType = {
   signUp: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
   isAdmin: boolean;
+  isPremium: boolean;
+  upgradeToPremeium: () => Promise<boolean>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -23,6 +25,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isPremium, setIsPremium] = useState(false);
 
   useEffect(() => {
     const getSession = async () => {
@@ -47,6 +50,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             } else {
               setProfile(profile);
               setIsAdmin(profile?.is_admin || false);
+              setIsPremium(profile?.is_premium || false);
             }
           }
         }
@@ -76,11 +80,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
               } else {
                 setProfile(data);
                 setIsAdmin(data?.is_admin || false);
+                setIsPremium(data?.is_premium || false);
               }
             });
         } else {
           setProfile(null);
           setIsAdmin(false);
+          setIsPremium(false);
         }
       }
     );
@@ -128,6 +134,28 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  const upgradeToPremeium = async () => {
+    if (!user) return false;
+    
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .update({ is_premium: true })
+        .eq('id', user.id)
+        .select()
+        .single();
+      
+      if (error) throw error;
+      
+      setProfile(data);
+      setIsPremium(true);
+      return true;
+    } catch (error) {
+      console.error('Error upgrading to premium:', error);
+      return false;
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -139,6 +167,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         signUp,
         signOut,
         isAdmin,
+        isPremium,
+        upgradeToPremeium,
       }}
     >
       {children}
