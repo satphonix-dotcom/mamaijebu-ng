@@ -3,19 +3,17 @@ import { useEffect, useState } from 'react';
 import { AdminLayout } from '@/components/AdminLayout';
 import { Profile } from '@/types/supabase';
 import { Button } from '@/components/ui/button';
-import { PlusIcon, RefreshCw } from 'lucide-react';
+import { RefreshCw } from 'lucide-react';
 import { DeleteUserDialog } from '@/components/admin/users/DeleteUserDialog';
 import { EditUserDialog } from '@/components/admin/users/EditUserDialog';
-import { CreateUserDialog } from '@/components/admin/users/CreateUserDialog';
 import { UsersTable } from '@/components/admin/users/UsersTable';
 import { useUsers } from '@/hooks/useUsers';
 import { useToast } from '@/components/ui/use-toast';
 
 export default function Users() {
-  const { users, isLoading, fetchUsers, deleteUser, updateUser, createUser } = useUsers();
+  const { users, isLoading, fetchUsers, deleteUser, updateUser } = useUsers();
   const [userToDelete, setUserToDelete] = useState<Profile | null>(null);
   const [userToEdit, setUserToEdit] = useState<Profile | null>(null);
-  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const { toast } = useToast();
 
   // Fetch users on initial mount
@@ -39,19 +37,6 @@ export default function Users() {
     }
   };
 
-  const handleCreateUser = async (newUser: Omit<Profile, 'id' | 'created_at' | 'updated_at'> & { password: string }) => {
-    const success = await createUser(newUser);
-    if (success) {
-      setIsCreateDialogOpen(false);
-      // Force a refresh after creating a new user
-      await fetchUsers();
-      toast({
-        title: 'User list updated',
-        description: 'The user list has been refreshed with the latest data.'
-      });
-    }
-  };
-
   const handleRefresh = async () => {
     await fetchUsers();
     toast({
@@ -69,9 +54,6 @@ export default function Users() {
             <Button variant="outline" onClick={handleRefresh} disabled={isLoading}>
               <RefreshCw className="h-4 w-4 mr-2" />
               Refresh
-            </Button>
-            <Button onClick={() => setIsCreateDialogOpen(true)}>
-              <PlusIcon className="mr-2 h-4 w-4" /> Add User
             </Button>
           </div>
         </div>
@@ -98,12 +80,6 @@ export default function Users() {
           onOpenChange={(open) => !open && setUserToEdit(null)}
           user={userToEdit}
           onSave={handleUpdateUser}
-        />
-
-        <CreateUserDialog 
-          isOpen={isCreateDialogOpen}
-          onOpenChange={setIsCreateDialogOpen}
-          onSave={handleCreateUser}
         />
       </div>
     </AdminLayout>
