@@ -52,6 +52,11 @@ export const AdminLayout = ({ children }: { children: React.ReactNode }) => {
                   </Button>
                 </li>
                 <li>
+                  <Button variant="ghost" onClick={() => navigate('/admin/users')}>
+                    Users
+                  </Button>
+                </li>
+                <li>
                   <Button variant="ghost" onClick={() => navigate('/')}>
                     Back to Site
                   </Button>

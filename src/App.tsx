@@ -13,6 +13,7 @@ import Games from "./pages/admin/Games";
 import Draws from "./pages/admin/Draws";
 import Countries from "./pages/admin/Countries";
 import LottoTypes from "./pages/admin/LottoTypes";
+import Users from "./pages/admin/Users";
 import AdminDashboard from "./pages/admin/Dashboard";
 import Search from "./pages/Search";
 
@@ -35,6 +36,7 @@ const App = () => (
             <Route path="/admin/draws" element={<Draws />} />
             <Route path="/admin/countries" element={<Countries />} />
             <Route path="/admin/lotto-types" element={<LottoTypes />} />
+            <Route path="/admin/users" element={<Users />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
