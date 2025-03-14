@@ -34,6 +34,7 @@ export type Database = {
         Row: {
           created_at: string
           draw_date: string
+          draw_number: string | null
           game_id: string
           id: string
           numbers: number[]
@@ -42,6 +43,7 @@ export type Database = {
         Insert: {
           created_at?: string
           draw_date: string
+          draw_number?: string | null
           game_id: string
           id?: string
           numbers: number[]
@@ -50,6 +52,7 @@ export type Database = {
         Update: {
           created_at?: string
           draw_date?: string
+          draw_number?: string | null
           game_id?: string
           id?: string
           numbers?: number[]

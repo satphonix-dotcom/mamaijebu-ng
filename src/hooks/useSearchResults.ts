@@ -18,7 +18,7 @@ interface SearchResult {
   game_name: string;
   draw_date: string;
   numbers: number[];
-  draw_number?: string; // Keep this as optional since it might not be in DB
+  draw_number?: string;
   matched_positions?: number[];
 }
 
