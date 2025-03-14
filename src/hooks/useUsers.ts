@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Profile } from '@/types/supabase';
@@ -25,8 +26,13 @@ export function useUsers() {
       console.log('Fetched users:', data?.length || 0);
       console.log('User data:', data); // Log the actual user data for debugging
       
+      // If data exists, sort it before setting
+      const sortedData = data ? [...data].sort((a, b) => 
+        new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      ) : [];
+      
       // Ensure we're setting all users we get back
-      setUsers(data || []);
+      setUsers(sortedData);
     } catch (error) {
       console.error('Error fetching users:', error);
       toast({

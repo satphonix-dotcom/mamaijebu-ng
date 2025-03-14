@@ -1,4 +1,3 @@
-
 import { Database } from '@/integrations/supabase/types';
 
 // Export the Database type
@@ -38,3 +37,8 @@ export type LottoGameUpdate = Database['public']['Tables']['lotto_games']['Updat
 export type LottoDrawUpdate = Database['public']['Tables']['lotto_draws']['Update'];
 export type CountryUpdate = Database['public']['Tables']['countries']['Update'];
 export type LottoTypeUpdate = Database['public']['Tables']['lotto_types']['Update'];
+
+// Add new type for subscription plans
+export type SubscriptionPlan = Database['public']['Tables']['subscription_plans']['Row'];
+export type SubscriptionPlanInsert = Database['public']['Tables']['subscription_plans']['Insert'];
+export type SubscriptionPlanUpdate = Database['public']['Tables']['subscription_plans']['Update'];
