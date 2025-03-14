@@ -66,6 +66,17 @@ const Navbar = () => {
             >
               Search
             </Link>
+            {user && (
+              <Link
+                to="/dashboard"
+                className={cn(
+                  "text-sm font-medium transition-colors hover:text-primary",
+                  pathname === "/dashboard" ? "text-foreground" : "text-muted-foreground"
+                )}
+              >
+                Dashboard
+              </Link>
+            )}
             {isAdmin && (
               <Link
                 to="/admin/dashboard"
@@ -93,7 +104,7 @@ const Navbar = () => {
                 Navigate through the application.
               </SheetDescription>
             </SheetHeader>
-            <nav className="grid gap-4 text-lg font-medium">
+            <nav className="grid gap-4 text-lg font-medium mt-6">
               <Link to="/" className="hover:text-primary" onClick={() => setIsMobileMenuOpen(false)}>
                 Home
               </Link>
@@ -103,6 +114,15 @@ const Navbar = () => {
               <Link to="/search" className="hover:text-primary" onClick={() => setIsMobileMenuOpen(false)}>
                 Search
               </Link>
+              {user && (
+                <Link 
+                  to="/dashboard" 
+                  className="hover:text-primary" 
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  Dashboard
+                </Link>
+              )}
               {isAdmin && (
                 <Link
                   to="/admin/dashboard"
@@ -138,6 +158,9 @@ const Navbar = () => {
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
+              <DropdownMenuItem asChild>
+                <Link to="/dashboard">Dashboard</Link>
+              </DropdownMenuItem>
               <DropdownMenuItem onClick={() => signOut()}>
                 Logout
               </DropdownMenuItem>
