@@ -22,7 +22,7 @@ type SearchLogicType = 'both' | 'success' | 'machine' | 'position';
 export function SingleNumberSearch() {
   const [number, setNumber] = useState('');
   const [gameType, setGameType] = useState('all');
-  const [specificGame, setSpecificGame] = useState('');
+  const [specificGame, setSpecificGame] = useState('all');
   const [searchLogic, setSearchLogic] = useState<SearchLogicType>('both');
   const [games, setGames] = useState<LottoGame[]>([]);
   const [loading, setLoading] = useState(false);
@@ -89,7 +89,7 @@ export function SingleNumberSearch() {
     performSearch({
       number: numberInt,
       gameTypeId: gameType === 'all' ? null : gameType,
-      gameId: specificGame || null,
+      gameId: specificGame === 'all' ? null : specificGame,
       searchLogic
     });
   };
@@ -97,7 +97,7 @@ export function SingleNumberSearch() {
   const handleClear = () => {
     setNumber('');
     setGameType('all');
-    setSpecificGame('');
+    setSpecificGame('all');
     setSearchLogic('both');
   };
 
@@ -123,7 +123,7 @@ export function SingleNumberSearch() {
           <Label htmlFor="gameType">Game Franchise</Label>
           <Select value={gameType} onValueChange={(value) => {
             setGameType(value);
-            setSpecificGame('');
+            setSpecificGame('all');
           }}>
             <SelectTrigger id="gameType">
               <SelectValue placeholder="Select game franchise" />
@@ -147,7 +147,7 @@ export function SingleNumberSearch() {
               <SelectValue placeholder="Select specific game" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Games in Franchise</SelectItem>
+              <SelectItem value="all">All Games in Franchise</SelectItem>
               {filteredGames.map((game) => (
                 <SelectItem key={game.id} value={game.id}>
                   {game.name}
