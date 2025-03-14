@@ -11,7 +11,7 @@ import {
   DrawerFooter,
 } from "@/components/ui/drawer";
 import { Button } from '@/components/ui/button';
-import { Menu } from 'lucide-react';
+import { Menu, ChartBar } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { SearchTabContent } from './SearchTabContent';
 
@@ -22,7 +22,8 @@ export const tabOptions = [
   { id: "tworow", label: "Two Row Numbers" },
   { id: "threerow", label: "Three Row Numbers" },
   { id: "lapping", label: "Lapping Numbers" },
-  { id: "knocking", label: "Knocking Numbers" }
+  { id: "knocking", label: "Knocking Numbers" },
+  { id: "chart", label: "View Chart", icon: ChartBar }
 ];
 
 interface SearchTabsProps {
@@ -66,6 +67,7 @@ export function SearchTabs({ isMobile, activeTab, setActiveTab }: SearchTabsProp
                       className="justify-start w-full"
                       onClick={() => handleTabChange(tab.id)}
                     >
+                      {tab.icon && <tab.icon className="mr-2 h-4 w-4" />}
                       {tab.label}
                     </Button>
                   ))}
@@ -86,13 +88,14 @@ export function SearchTabs({ isMobile, activeTab, setActiveTab }: SearchTabsProp
   
   return (
     <Tabs defaultValue="single" value={activeTab} onValueChange={setActiveTab}>
-      <TabsList className="mb-6 w-full max-w-3xl grid grid-cols-5 gap-4">
+      <TabsList className="mb-6 w-full grid grid-cols-4 md:grid-cols-8 gap-2">
         {tabOptions.map((tab) => (
           <TabsTrigger 
             key={tab.id} 
             value={tab.id} 
-            className="px-2 py-2 text-sm md:text-base md:px-4"
+            className="px-2 py-2 text-sm md:text-base md:px-4 flex items-center justify-center"
           >
+            {tab.icon && <tab.icon className="mr-2 h-4 w-4" />}
             {tab.label}
           </TabsTrigger>
         ))}
