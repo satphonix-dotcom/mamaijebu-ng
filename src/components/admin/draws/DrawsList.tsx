@@ -29,12 +29,18 @@ interface DrawsListProps {
 export const DrawsList = ({ draws, loading, onDeleteDraw }: DrawsListProps) => {
   const [drawToDelete, setDrawToDelete] = useState<string | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDelete = async () => {
     if (drawToDelete && onDeleteDraw) {
-      await onDeleteDraw(drawToDelete);
-      setDrawToDelete(null);
-      setIsDeleteDialogOpen(false);
+      try {
+        setIsDeleting(true);
+        await onDeleteDraw(drawToDelete);
+        setDrawToDelete(null);
+        setIsDeleteDialogOpen(false);
+      } finally {
+        setIsDeleting(false);
+      }
     }
   };
 
@@ -110,9 +116,13 @@ export const DrawsList = ({ draws, loading, onDeleteDraw }: DrawsListProps) => {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setDrawToDelete(null)}>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground">
-              Delete
+            <AlertDialogCancel onClick={() => setDrawToDelete(null)} disabled={isDeleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleDelete} 
+              className="bg-destructive text-destructive-foreground"
+              disabled={isDeleting}
+            >
+              {isDeleting ? 'Deleting...' : 'Delete'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

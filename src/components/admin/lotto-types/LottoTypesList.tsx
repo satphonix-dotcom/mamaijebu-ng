@@ -32,12 +32,18 @@ export function LottoTypesList({
 }: LottoTypesListProps) {
   const [typeToDelete, setTypeToDelete] = useState<string | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDelete = async () => {
     if (typeToDelete && onDeleteType) {
-      await onDeleteType(typeToDelete);
-      setTypeToDelete(null);
-      setIsDeleteDialogOpen(false);
+      try {
+        setIsDeleting(true);
+        await onDeleteType(typeToDelete);
+        setTypeToDelete(null);
+        setIsDeleteDialogOpen(false);
+      } finally {
+        setIsDeleting(false);
+      }
     }
   };
 
@@ -132,9 +138,13 @@ export function LottoTypesList({
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setTypeToDelete(null)}>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground">
-              Delete
+            <AlertDialogCancel onClick={() => setTypeToDelete(null)} disabled={isDeleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleDelete} 
+              className="bg-destructive text-destructive-foreground"
+              disabled={isDeleting}
+            >
+              {isDeleting ? 'Deleting...' : 'Delete'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

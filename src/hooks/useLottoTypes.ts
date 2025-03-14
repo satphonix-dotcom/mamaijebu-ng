@@ -40,7 +40,9 @@ export function useLottoTypes() {
       
       if (error) throw error;
       
-      setLottoTypes([...(data || []), ...lottoTypes]);
+      if (data) {
+        setLottoTypes(prevTypes => [...(data || []), ...prevTypes]);
+      }
       
       toast({
         title: 'Success',
@@ -70,9 +72,11 @@ export function useLottoTypes() {
       if (error) throw error;
       
       // Update the local state with the updated type
-      setLottoTypes(lottoTypes.map(type => 
-        type.id === id ? { ...type, ...data?.[0] } : type
-      ));
+      if (data && data.length > 0) {
+        setLottoTypes(prevTypes => 
+          prevTypes.map(type => type.id === id ? data[0] : type)
+        );
+      }
       
       toast({
         title: 'Success',
@@ -93,6 +97,26 @@ export function useLottoTypes() {
 
   const deleteLottoType = async (id: string) => {
     try {
+      console.log('Deleting lotto type with ID:', id);
+      
+      // First, check if there are any games associated with this type
+      const { data: games, error: gamesError } = await supabase
+        .from('lotto_games')
+        .select('id')
+        .eq('lotto_type_id', id)
+        .limit(1);
+      
+      if (gamesError) throw gamesError;
+      
+      if (games && games.length > 0) {
+        toast({
+          title: 'Cannot Delete Lottery Type',
+          description: 'This type is used by one or more games. Delete those games first.',
+          variant: 'destructive',
+        });
+        return;
+      }
+      
       const { error } = await supabase
         .from('lotto_types')
         .delete()
@@ -101,7 +125,7 @@ export function useLottoTypes() {
       if (error) throw error;
       
       // Update the local state by removing the deleted type
-      setLottoTypes(lottoTypes.filter(type => type.id !== id));
+      setLottoTypes(prevTypes => prevTypes.filter(type => type.id !== id));
       
       toast({
         title: 'Success',
