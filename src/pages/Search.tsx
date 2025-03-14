@@ -40,6 +40,7 @@ export default function Search() {
     { id: "tworow", label: "Two Row Numbers" },
     { id: "threerow", label: "Three Row Numbers" },
     { id: "lapping", label: "Lapping Numbers" },
+    { id: "knocking", label: "Knocking Numbers" } // New tab
   ];
 
   const renderTabContent = (id: string) => {
@@ -120,11 +121,25 @@ export default function Search() {
             <CardHeader>
               <CardTitle>Lapping Numbers Search</CardTitle>
               <CardDescription>
-                Search for lapping vertical sequence of numbers between two consecutive draws. Find where numbers appear in same positions across consecutive draws.
+                Search for lapping vertical sequence of numbers between two consecutive draws.
               </CardDescription>
             </CardHeader>
             <CardContent>
               <LappingNumbersSearch />
+            </CardContent>
+          </Card>
+        );
+      case "knocking":
+        return (
+          <Card>
+            <CardHeader>
+              <CardTitle>Knocking Numbers Search</CardTitle>
+              <CardDescription>
+                Search for knocking pattern of numbers between three consecutive draws.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <KnockingNumbersSearch />
             </CardContent>
           </Card>
         );
