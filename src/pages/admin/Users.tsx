@@ -111,19 +111,22 @@ export default function Users() {
 
   const handleCreateUser = async (newUser: Omit<Profile, 'id' | 'created_at' | 'updated_at'>) => {
     try {
-      // Create auth user first (this requires using an Edge Function in a real-world scenario)
-      // For this implementation, we're assuming the user already exists in auth.users
-      // and we're just adding them to profiles
+      // Generate a UUID for the new user - in a real app this should come from auth system
+      const id = crypto.randomUUID();
       
       const { data, error } = await supabase
         .from('profiles')
         .insert({
+          id, // Include the generated ID
           email: newUser.email,
           is_admin: newUser.is_admin,
         })
         .select();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error creating user:', error);
+        throw error;
+      }
       
       if (data && data.length > 0) {
         setUsers([data[0], ...users]);
@@ -132,11 +135,11 @@ export default function Users() {
           description: 'New user has been successfully created.',
         });
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error creating user:', error);
       toast({
         title: 'Failed to create user',
-        description: 'There was an error creating the user.',
+        description: 'There was an error creating the user. Note: In a real app, this would require creating an auth user first.',
         variant: 'destructive',
       });
     } finally {

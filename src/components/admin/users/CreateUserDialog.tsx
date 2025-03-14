@@ -1,5 +1,5 @@
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Profile } from "@/types/supabase";
 import { useState } from "react";
@@ -48,6 +48,9 @@ export function CreateUserDialog({ isOpen, onOpenChange, onSave }: CreateUserDia
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Create New User</DialogTitle>
+          <DialogDescription>
+            Create a new user profile. Note: In a production app, this would create an authentication user as well.
+          </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="grid grid-cols-4 items-center gap-4">
