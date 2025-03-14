@@ -65,16 +65,16 @@ export function TwoRowSearchResults({
                 {results.map((result, index) => (
                   <tr key={index}>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {result.date}
+                      {result.draw_date}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {result.game}
+                      {result.game_name}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {result.numbers.join(', ')}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {result.matches}
+                      {result.first_row_matched || result.second_row_matched ? 'Yes' : 'No'}
                     </td>
                   </tr>
                 ))}

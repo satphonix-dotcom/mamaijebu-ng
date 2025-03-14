@@ -15,7 +15,7 @@ export interface TwoRowSearchParams {
   secondRowMatchLogic: MatchLogicType;
 }
 
-interface SearchResult {
+export interface SearchResult {
   id: string;
   game_name: string;
   draw_date: string;
