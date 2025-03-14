@@ -94,12 +94,23 @@ export function useUsers() {
       const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
       const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
       
-      if (!supabaseUrl) {
+      // Log the URL for debugging
+      console.log('Supabase URL:', supabaseUrl);
+      
+      if (!supabaseUrl || supabaseUrl.trim() === '') {
+        console.error('Supabase URL is not configured or is empty');
         throw new Error('Supabase URL not configured');
       }
       
+      // Ensure URL has the proper format
+      const formattedUrl = supabaseUrl.endsWith('/') 
+        ? supabaseUrl.slice(0, -1) 
+        : supabaseUrl;
+        
+      console.log('Calling edge function at:', `${formattedUrl}/functions/v1/create-user`);
+      
       // Call our edge function to create the user with the full URL
-      const response = await fetch(`${supabaseUrl}/functions/v1/create-user`, {
+      const response = await fetch(`${formattedUrl}/functions/v1/create-user`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -111,6 +122,8 @@ export function useUsers() {
           is_admin
         })
       });
+      
+      console.log('Response status:', response.status);
       
       if (!response.ok) {
         // Properly handle non-200 response
@@ -125,6 +138,7 @@ export function useUsers() {
       }
       
       const responseData = await response.json();
+      console.log('User creation successful:', responseData);
       
       if (responseData.user) {
         setUsers([responseData.user, ...users]);
