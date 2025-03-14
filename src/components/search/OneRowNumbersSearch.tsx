@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -140,10 +139,10 @@ export function OneRowNumbersSearch() {
   return (
     <div className="space-y-6">
       <div className="grid gap-6">
-        {/* Number input boxes */}
+        {/* Number input boxes - updated to display all on one line */}
         <div className="space-y-2">
           <Label>Success and Machine Numbers</Label>
-          <div className="grid grid-cols-5 gap-2">
+          <div className="grid grid-cols-10 gap-2">
             {successNumbers.map((num, index) => (
               <Input
                 key={`success-${index}`}
@@ -156,8 +155,6 @@ export function OneRowNumbersSearch() {
                 className="bg-blue-50 border-blue-200"
               />
             ))}
-          </div>
-          <div className="grid grid-cols-5 gap-2 mt-2">
             {machineNumbers.map((num, index) => (
               <Input
                 key={`machine-${index}`}
