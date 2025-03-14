@@ -24,8 +24,7 @@ import {
 import { Menu } from "lucide-react";
 
 const Navbar = () => {
-  const { user, signOut } = useAuth();
-  const isAdmin = user?.email === "admin@example.com";
+  const { user, signOut, isAdmin } = useAuth();
   const { pathname } = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -161,6 +160,11 @@ const Navbar = () => {
               <DropdownMenuItem asChild>
                 <Link to="/dashboard">Dashboard</Link>
               </DropdownMenuItem>
+              {isAdmin && (
+                <DropdownMenuItem asChild>
+                  <Link to="/admin/dashboard">Admin Dashboard</Link>
+                </DropdownMenuItem>
+              )}
               <DropdownMenuItem onClick={() => signOut()}>
                 Logout
               </DropdownMenuItem>
