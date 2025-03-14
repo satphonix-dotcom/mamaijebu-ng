@@ -24,16 +24,24 @@ export function NumberInputRow({
         {numbers.map((num, index) => (
           <Input
             key={`${rowLabel.toLowerCase().replace(/\s+/g, '-')}-${index}`}
-            className="w-full text-center"
+            className="w-full text-center px-1"
             value={num}
-            onChange={(e) => onChange(index, e.target.value)}
-            type="number"
-            min="1"
-            max="99"
+            onChange={(e) => {
+              const value = e.target.value;
+              // Only allow up to 2 digits
+              if (value === '' || (/^\d{1,2}$/.test(value) && parseInt(value) <= 99)) {
+                onChange(index, value);
+              }
+            }}
+            type="text"
+            inputMode="numeric"
+            pattern="[0-9]*"
+            maxLength={2}
             placeholder={(index + 1).toString()}
             style={{ 
               appearance: 'textfield',
-              width: '100%' 
+              width: '100%',
+              fontSize: isMobile ? '16px' : 'inherit'
             }}
           />
         ))}

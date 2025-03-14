@@ -55,7 +55,7 @@ export const ThreeRowFormControls: React.FC<ThreeRowFormControlsProps> = ({
   onSubmit
 }) => {
   return (
-    <form onSubmit={onSubmit} className="space-y-6">
+    <form onSubmit={onSubmit} className={`space-y-4 ${isMobile ? 'w-full' : 'space-y-6'}`}>
       {/* Number Input Rows */}
       <NumberInputRow 
         numbers={firstRowNumbers} 
