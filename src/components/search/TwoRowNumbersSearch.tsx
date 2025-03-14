@@ -6,6 +6,7 @@ import { LottoGame } from '@/types/supabase';
 import { TwoRowSearchForm } from '@/components/search/TwoRowSearchForm';
 import { TwoRowSearchResults } from '@/components/search/TwoRowSearchResults';
 import { useTwoRowSearch } from '@/hooks/useTwoRowSearch';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 export function TwoRowNumbersSearch() {
   const [games, setGames] = useState<LottoGame[]>([]);
@@ -13,6 +14,7 @@ export function TwoRowNumbersSearch() {
   const [gamesByType, setGamesByType] = useState<{[key: string]: LottoGame[]}>({});
   const { lottoTypes } = useLottoTypes();
   const { searchResults, performSearch, isSearching } = useTwoRowSearch();
+  const isMobile = useIsMobile();
 
   // Fetch games data
   useEffect(() => {
@@ -68,6 +70,7 @@ export function TwoRowNumbersSearch() {
       <TwoRowSearchResults 
         results={searchResults} 
         isSearching={isSearching} 
+        isMobile={isMobile}
       />
     </div>
   );
