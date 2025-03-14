@@ -31,7 +31,7 @@ export default function Games() {
         .select(`
           *,
           countries (*),
-          lotto_type:lotto_type_id (*)
+          lotto_types (*)
         `)
         .order('name', { ascending: true });
       
@@ -75,6 +75,25 @@ export default function Games() {
 
   const handleDeleteGame = async (id: string) => {
     try {
+      // First, check if there are any draws associated with this game
+      const { data: draws, error: drawsError } = await supabase
+        .from('lotto_draws')
+        .select('id')
+        .eq('game_id', id)
+        .limit(1);
+      
+      if (drawsError) throw drawsError;
+      
+      if (draws && draws.length > 0) {
+        toast({
+          title: 'Cannot Delete Game',
+          description: 'This game has draws associated with it. Delete the draws first.',
+          variant: 'destructive',
+        });
+        return;
+      }
+      
+      // If no draws are associated, proceed with deletion
       const { error } = await supabase
         .from('lotto_games')
         .delete()
