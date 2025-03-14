@@ -30,7 +30,7 @@ export function ViewChartTabContent() {
   const [showChart, setShowChart] = useState(false);
   const [chartData, setChartData] = useState<any[]>([]);
   
-  const { lottoTypes, isLoading: isLoadingTypes } = useLottoTypes();
+  const { lottoTypes, loading } = useLottoTypes();
   const { games } = useGames();
   
   const availableYears = Array.from(
@@ -102,7 +102,7 @@ export function ViewChartTabContent() {
           <Button 
             onClick={handleGenerateChart} 
             className="mt-4 w-full md:w-auto"
-            disabled={isLoadingTypes}
+            disabled={loading}
           >
             <ChartBar className="mr-2 h-4 w-4" />
             Generate Chart
