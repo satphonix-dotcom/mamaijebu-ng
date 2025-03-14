@@ -1,90 +1,155 @@
-
-import { Menu } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import { useToast } from "@/hooks/use-toast";
+import { cn } from "@/lib/utils";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import { Menu } from "lucide-react";
 
-export const Navbar = () => {
-  const { user, signOut, isAdmin } = useAuth();
-  const navigate = useNavigate();
-  const { toast } = useToast();
-
-  const handleSignOut = async () => {
-    try {
-      await signOut();
-      toast({
-        title: "Signed out",
-        description: "You have been signed out successfully",
-      });
-      navigate('/');
-    } catch (error) {
-      console.error('Error signing out:', error);
-      toast({
-        title: "Error",
-        description: "Failed to sign out",
-        variant: "destructive",
-      });
-    }
-  };
+const Navbar = () => {
+  const { user, signOut } = useAuth();
+  const isAdmin = user?.email === "admin@example.com";
+  const { pathname } = useLocation();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
-    <nav className="fixed top-0 left-0 right-0 bg-white/80 backdrop-blur-md border-b border-gray-200 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          <div className="flex items-center">
-            <Button variant="ghost" size="icon" className="lg:hidden">
-              <Menu className="h-6 w-6" />
-            </Button>
-            <div className="ml-2 lg:ml-0 flex items-center">
-              <Link to="/" className="text-xl font-semibold text-gray-900">LottoGaze</Link>
+    <header className="bg-background border-b sticky top-0 z-30">
+      <div className="container flex h-16 items-center justify-between py-4">
+        <div className="flex gap-6 md:gap-10">
+          <Link to="/" className="hidden md:block">
+            <div className="flex items-center space-x-2">
+              <span className="font-bold text-xl">LottoStats</span>
             </div>
-          </div>
-          <div className="hidden lg:flex items-center space-x-4">
-            <Link to="/">
-              <Button variant="ghost">Home</Button>
+          </Link>
+          <nav className="hidden md:flex gap-6">
+            <Link
+              to="/"
+              className={cn(
+                "text-sm font-medium transition-colors hover:text-primary",
+                pathname === "/" ? "text-foreground" : "text-muted-foreground"
+              )}
+            >
+              Home
             </Link>
-            
-            {user && (
-              <Link to="/dashboard">
-                <Button variant="ghost">Dashboard</Button>
-              </Link>
-            )}
-            
-            <Link to="/search">
-              <Button variant="ghost">Search</Button>
+            <Link
+              to="/games"
+              className={cn(
+                "text-sm font-medium transition-colors hover:text-primary",
+                pathname === "/games" ? "text-foreground" : "text-muted-foreground"
+              )}
+            >
+              Games
             </Link>
-            <Link to="/history">
-              <Button variant="ghost">History</Button>
+            <Link
+              to="/search"
+              className={cn(
+                "text-sm font-medium transition-colors hover:text-primary",
+                pathname === "/search" ? "text-foreground" : "text-muted-foreground"
+              )}
+            >
+              Search
             </Link>
-            
             {isAdmin && (
-              <Link to="/admin/dashboard">
-                <Button variant="ghost">Admin</Button>
+              <Link
+                to="/admin/dashboard"
+                className={cn(
+                  "text-sm font-medium transition-colors hover:text-primary",
+                  pathname.startsWith("/admin") ? "text-foreground" : "text-muted-foreground"
+                )}
+              >
+                Admin
               </Link>
             )}
-            
-            {user ? (
-              <Button variant="default" onClick={handleSignOut}>
-                Sign Out
-              </Button>
-            ) : (
-              <div className="flex space-x-2">
-                <Link to="/login">
-                  <Button variant="default" className="bg-primary-400 hover:bg-primary-500">
-                    Sign In
-                  </Button>
-                </Link>
-                <Link to="/login?tab=signup">
-                  <Button variant="outline">
-                    Sign Up
-                  </Button>
-                </Link>
-              </div>
-            )}
-          </div>
+          </nav>
         </div>
+        
+        <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
+          <SheetTrigger asChild className="md:hidden">
+            <Button variant="ghost" size="sm">
+              <Menu className="h-5 w-5" />
+            </Button>
+          </SheetTrigger>
+          <SheetContent side="left" className="w-full sm:w-2/3 md:w-1/2">
+            <SheetHeader className="text-left">
+              <SheetTitle>Menu</SheetTitle>
+              <SheetDescription>
+                Navigate through the application.
+              </SheetDescription>
+            </SheetHeader>
+            <nav className="grid gap-4 text-lg font-medium">
+              <Link to="/" className="hover:text-primary" onClick={() => setIsMobileMenuOpen(false)}>
+                Home
+              </Link>
+              <Link to="/games" className="hover:text-primary" onClick={() => setIsMobileMenuOpen(false)}>
+                Games
+              </Link>
+              <Link to="/search" className="hover:text-primary" onClick={() => setIsMobileMenuOpen(false)}>
+                Search
+              </Link>
+              {isAdmin && (
+                <Link
+                  to="/admin/dashboard"
+                  className="hover:text-primary"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  Admin
+                </Link>
+              )}
+            </nav>
+          </SheetContent>
+        </Sheet>
+
+        {user ? (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <Avatar className="h-8 w-8">
+                  <AvatarImage src={user?.photoURL || ""} alt={user?.email || "User"} />
+                  <AvatarFallback>
+                    {user?.email ? user.email[0].toUpperCase() : "U"}
+                  </AvatarFallback>
+                </Avatar>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56" align="end" forceMount>
+              <DropdownMenuLabel className="font-normal">
+                <div className="flex flex-col space-y-1">
+                  <p className="text-sm font-medium leading-none">{user?.email}</p>
+                  <p className="text-xs leading-none text-muted-foreground">
+                    {isAdmin ? "Administrator" : "User"}
+                  </p>
+                </div>
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => signOut()}>
+                Logout
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        ) : (
+          <Link to="/login">
+            <Button>Login</Button>
+          </Link>
+        )}
       </div>
-    </nav>
+    </header>
   );
 };
+
+export default Navbar;
