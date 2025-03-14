@@ -1,13 +1,14 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useToast } from '@/components/ui/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { LottoGame } from '@/types/supabase';
+import { LottoGame, Country } from '@/types/supabase';
+import { GameSelector } from './GameSelector';
+import { CountrySelector } from './CountrySelector';
 
 interface CreateDrawDialogProps {
   games: LottoGame[];
@@ -16,15 +17,47 @@ interface CreateDrawDialogProps {
 
 export const CreateDrawDialog = ({ games, onSuccess }: CreateDrawDialogProps) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [selectedGame, setSelectedGame] = useState<LottoGame | null>(null);
+  const [selectedCountry, setSelectedCountry] = useState<string>('');
+  const [selectedGame, setSelectedGame] = useState<string>('');
   const [drawDate, setDrawDate] = useState('');
+  const [drawNumber, setDrawNumber] = useState('');
   const [numbers, setNumbers] = useState<string>('');
+  const [countries, setCountries] = useState<Country[]>([]);
   const { toast } = useToast();
 
-  const handleGameChange = (gameId: string) => {
-    const game = games.find(g => g.id === gameId);
-    setSelectedGame(game || null);
-  };
+  // Fetch countries when component mounts
+  useEffect(() => {
+    const fetchCountries = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('countries')
+          .select('*')
+          .order('name', { ascending: true });
+
+        if (error) throw error;
+        setCountries(data || []);
+      } catch (error) {
+        console.error('Error fetching countries:', error);
+        toast({
+          title: 'Error',
+          description: 'Failed to load countries. Please try again.',
+          variant: 'destructive',
+        });
+      }
+    };
+
+    if (isDialogOpen) {
+      fetchCountries();
+    }
+  }, [isDialogOpen, toast]);
+
+  // Reset selected game when country changes
+  useEffect(() => {
+    setSelectedGame('');
+  }, [selectedCountry]);
+
+  // Get the currently selected game
+  const selectedGameObject = games.find(g => g.id === selectedGame);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,20 +75,29 @@ export const CreateDrawDialog = ({ games, onSuccess }: CreateDrawDialogProps) =>
       // Parse and validate numbers
       const numbersArray = numbers.split(',').map(n => parseInt(n.trim(), 10));
       
-      if (numbersArray.length !== selectedGame.ball_count) {
+      if (!selectedGameObject) {
         toast({
           title: 'Error',
-          description: `You must enter exactly ${selectedGame.ball_count} numbers`,
+          description: 'Selected game not found',
+          variant: 'destructive',
+        });
+        return;
+      }
+      
+      if (numbersArray.length !== selectedGameObject.ball_count) {
+        toast({
+          title: 'Error',
+          description: `You must enter exactly ${selectedGameObject.ball_count} numbers`,
           variant: 'destructive',
         });
         return;
       }
       
       for (const num of numbersArray) {
-        if (isNaN(num) || num < selectedGame.min_number || num > selectedGame.max_number) {
+        if (isNaN(num) || num < selectedGameObject.min_number || num > selectedGameObject.max_number) {
           toast({
             title: 'Error',
-            description: `All numbers must be between ${selectedGame.min_number} and ${selectedGame.max_number}`,
+            description: `All numbers must be between ${selectedGameObject.min_number} and ${selectedGameObject.max_number}`,
             variant: 'destructive',
           });
           return;
@@ -65,16 +107,19 @@ export const CreateDrawDialog = ({ games, onSuccess }: CreateDrawDialogProps) =>
       const { error } = await supabase
         .from('lotto_draws')
         .insert([{
-          game_id: selectedGame.id,
+          game_id: selectedGame,
           draw_date: drawDate,
+          draw_number: drawNumber || null,
           numbers: numbersArray
         }]);
       
       if (error) throw error;
       
       setIsDialogOpen(false);
-      setSelectedGame(null);
+      setSelectedCountry('');
+      setSelectedGame('');
       setDrawDate('');
+      setDrawNumber('');
       setNumbers('');
       
       toast({
@@ -105,21 +150,42 @@ export const CreateDrawDialog = ({ games, onSuccess }: CreateDrawDialogProps) =>
         <form onSubmit={handleSubmit}>
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="country" className="text-right">
+                Country
+              </Label>
+              <div className="col-span-3">
+                <CountrySelector
+                  countries={countries}
+                  selectedCountry={selectedCountry}
+                  onSelectCountry={setSelectedCountry}
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="game" className="text-right">
                 Game
               </Label>
-              <Select onValueChange={handleGameChange} required>
-                <SelectTrigger className="col-span-3">
-                  <SelectValue placeholder="Select a game" />
-                </SelectTrigger>
-                <SelectContent>
-                  {games.map(game => (
-                    <SelectItem key={game.id} value={game.id}>
-                      {game.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <div className="col-span-3">
+                <GameSelector
+                  games={games}
+                  selectedGame={selectedGame}
+                  onSelectGame={setSelectedGame}
+                  selectedCountry={selectedCountry}
+                  disabled={!selectedCountry}
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="draw_number" className="text-right">
+                Draw Number
+              </Label>
+              <Input
+                id="draw_number"
+                placeholder="e.g., 0001"
+                value={drawNumber}
+                onChange={(e) => setDrawNumber(e.target.value)}
+                className="col-span-3"
+              />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="draw_date" className="text-right">
@@ -146,9 +212,9 @@ export const CreateDrawDialog = ({ games, onSuccess }: CreateDrawDialogProps) =>
                   onChange={(e) => setNumbers(e.target.value)}
                   required
                 />
-                {selectedGame && (
+                {selectedGameObject && (
                   <p className="text-sm text-muted-foreground mt-1">
-                    Enter {selectedGame.ball_count} numbers between {selectedGame.min_number} and {selectedGame.max_number}, separated by commas.
+                    Enter {selectedGameObject.ball_count} numbers between {selectedGameObject.min_number} and {selectedGameObject.max_number}, separated by commas.
                   </p>
                 )}
               </div>

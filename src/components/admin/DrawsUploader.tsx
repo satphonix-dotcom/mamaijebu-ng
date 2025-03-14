@@ -1,13 +1,16 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/components/ui/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { LottoGame, LottoType } from '@/types/supabase';
+import { LottoGame, LottoType, Country } from '@/types/supabase';
 import { GameSelector } from './draws/GameSelector';
+import { CountrySelector } from './draws/CountrySelector';
 import { DrawDataInput } from './draws/DrawDataInput';
 import { parseDraws, validateDraw } from '@/utils/drawParser';
+import { Form, FormField, FormItem, FormLabel, FormControl } from '@/components/ui/form';
+import { useForm } from 'react-hook-form';
 
 interface DrawsUploaderProps {
   games: (LottoGame & { lotto_type?: LottoType })[];
@@ -16,9 +19,40 @@ interface DrawsUploaderProps {
 
 export const DrawsUploader = ({ games, onSuccess }: DrawsUploaderProps) => {
   const [rawData, setRawData] = useState('');
+  const [selectedCountry, setSelectedCountry] = useState<string>('');
   const [selectedGame, setSelectedGame] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
+  const [countries, setCountries] = useState<Country[]>([]);
   const { toast } = useToast();
+
+  // Fetch countries when component mounts
+  useEffect(() => {
+    const fetchCountries = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('countries')
+          .select('*')
+          .order('name', { ascending: true });
+
+        if (error) throw error;
+        setCountries(data || []);
+      } catch (error) {
+        console.error('Error fetching countries:', error);
+        toast({
+          title: 'Error',
+          description: 'Failed to load countries. Please try again.',
+          variant: 'destructive',
+        });
+      }
+    };
+
+    fetchCountries();
+  }, [toast]);
+
+  // Reset selected game when country changes
+  useEffect(() => {
+    setSelectedGame('');
+  }, [selectedCountry]);
 
   const handleUpload = async () => {
     if (!selectedGame) {
@@ -126,12 +160,26 @@ export const DrawsUploader = ({ games, onSuccess }: DrawsUploaderProps) => {
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          <div>
-            <GameSelector 
-              games={games} 
-              selectedGame={selectedGame} 
-              onSelectGame={setSelectedGame} 
-            />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="text-sm font-medium mb-1 block">Country</label>
+              <CountrySelector 
+                countries={countries} 
+                selectedCountry={selectedCountry} 
+                onSelectCountry={setSelectedCountry} 
+              />
+            </div>
+            
+            <div>
+              <label className="text-sm font-medium mb-1 block">Game</label>
+              <GameSelector 
+                games={games} 
+                selectedGame={selectedGame} 
+                onSelectGame={setSelectedGame}
+                selectedCountry={selectedCountry}
+                disabled={!selectedCountry} 
+              />
+            </div>
           </div>
           
           <DrawDataInput 

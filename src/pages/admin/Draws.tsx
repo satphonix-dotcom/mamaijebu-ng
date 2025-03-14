@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { useToast } from '@/components/ui/use-toast';
 import { AdminLayout } from '@/components/AdminLayout';
 import { supabase } from '@/integrations/supabase/client';
-import { LottoGame, LottoDraw } from '@/types/supabase';
+import { LottoGame, LottoDraw, Country } from '@/types/supabase';
 import { DrawsUploader } from '@/components/admin/DrawsUploader';
 import { CreateDrawDialog } from '@/components/admin/draws/CreateDrawDialog';
 import { DrawsList } from '@/components/admin/draws/DrawsList';
@@ -26,10 +26,13 @@ export default function Draws() {
   const fetchData = async () => {
     try {
       setLoading(true);
-      // Fetch games
+      // Fetch games with country information
       const { data: gamesData, error: gamesError } = await supabase
         .from('lotto_games')
-        .select('*');
+        .select(`
+          *,
+          countries(*)
+        `);
       
       if (gamesError) throw gamesError;
       setGames(gamesData || []);
