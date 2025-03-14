@@ -16,19 +16,26 @@ enum VerificationStatus {
 }
 
 const PremiumConfirmation = () => {
-  const { user, upgradeToPremeium } = useAuth();
+  const { user, upgradeToPremeium, isPremium } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [searchParams] = useSearchParams();
   const [status, setStatus] = useState<VerificationStatus>(VerificationStatus.LOADING);
   const [error, setError] = useState<string | null>(null);
+  const [verificationAttempts, setVerificationAttempts] = useState(0);
 
   // Get the reference from URL params
-  const reference = searchParams.get("reference");
+  const reference = searchParams.get("reference") || searchParams.get("trxref");
 
   useEffect(() => {
     if (!user) {
       navigate("/login");
+      return;
+    }
+
+    // If already premium, no need to verify
+    if (isPremium) {
+      setStatus(VerificationStatus.SUCCESS);
       return;
     }
 
@@ -40,18 +47,39 @@ const PremiumConfirmation = () => {
 
     const verifyPayment = async () => {
       try {
+        console.log("Verifying payment with reference:", reference);
+        
         // Call the verify payment edge function
         const { data, error } = await supabase.functions.invoke('verify-payment', {
           body: { reference }
         });
 
         if (error) {
+          console.error("Error invoking verify-payment function:", error);
           throw new Error(error.message);
         }
 
+        console.log("Verification response:", data);
+
+        if (!data) {
+          throw new Error("No data returned from verification");
+        }
+
         if (data.success) {
-          // Update local auth state
-          await upgradeToPremeium();
+          console.log("Payment verification successful, upgrading user to premium");
+          
+          // Try updating local auth state
+          const upgraded = await upgradeToPremeium();
+          
+          if (!upgraded) {
+            console.warn("Local auth state update failed, user will need to refresh");
+            toast({
+              title: "Partial Success",
+              description: "Your account has been upgraded but you may need to log out and back in to see premium features.",
+              variant: "destructive",
+            });
+          }
+          
           setStatus(VerificationStatus.SUCCESS);
           
           toast({
@@ -61,21 +89,43 @@ const PremiumConfirmation = () => {
         } else {
           throw new Error(data.message || "Payment verification failed");
         }
-      } catch (err) {
+      } catch (err: any) {
         console.error("Payment verification failed:", err);
         setStatus(VerificationStatus.ERROR);
         setError(err.message || "There was a problem verifying your payment");
         
-        toast({
-          title: "Verification Error",
-          description: err.message || "There was a problem verifying your payment",
-          variant: "destructive",
-        });
+        // If we've tried less than 3 times and it looks like a temporary issue, retry
+        if (verificationAttempts < 3 && (err.message?.includes("timeout") || err.message?.includes("network") || !err.message)) {
+          setVerificationAttempts(prev => prev + 1);
+          
+          toast({
+            title: "Verification Retry",
+            description: `Retrying payment verification (attempt ${verificationAttempts + 1}/3)...`,
+          });
+          
+          // Wait a bit before retrying
+          setTimeout(() => {
+            setStatus(VerificationStatus.LOADING);
+          }, 3000);
+        } else {
+          toast({
+            title: "Verification Error",
+            description: err.message || "There was a problem verifying your payment",
+            variant: "destructive",
+          });
+        }
       }
     };
 
-    verifyPayment();
-  }, [user, reference, navigate, toast, upgradeToPremeium]);
+    if (status === VerificationStatus.LOADING) {
+      verifyPayment();
+    }
+  }, [user, reference, navigate, toast, upgradeToPremeium, status, verificationAttempts, isPremium]);
+
+  const handleManualRefresh = async () => {
+    setStatus(VerificationStatus.LOADING);
+    setVerificationAttempts(0);
+  };
 
   if (!user) return null;
 
@@ -144,6 +194,11 @@ const PremiumConfirmation = () => {
                   We couldn't verify your payment. If you believe this is an error, please 
                   contact our support team with your reference number: {reference}
                 </p>
+                <div className="mt-4">
+                  <Button onClick={handleManualRefresh} variant="outline" size="sm">
+                    Try Again
+                  </Button>
+                </div>
               </div>
             )}
           </CardContent>

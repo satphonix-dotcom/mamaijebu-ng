@@ -63,6 +63,7 @@ serve(async (req) => {
     );
 
     const verifyData = await verifyResponse.json();
+    console.log("Paystack verification response:", JSON.stringify(verifyData));
 
     if (!verifyResponse.ok) {
       console.error("Error verifying payment:", verifyData);
@@ -79,6 +80,7 @@ serve(async (req) => {
 
     // Check if the payment was successful
     if (verifyData.data.status !== "success") {
+      console.log(`Payment status not successful: ${verifyData.data.status}`);
       return new Response(
         JSON.stringify({
           success: false,
@@ -111,6 +113,8 @@ serve(async (req) => {
       );
     }
 
+    console.log(`Updating premium status for user: ${userId}`);
+
     // Update the user's premium status in the database
     const { data: profileData, error: profileError } = await supabase
       .from("profiles")
@@ -127,6 +131,7 @@ serve(async (req) => {
       return new Response(
         JSON.stringify({
           error: "Failed to update user profile",
+          details: profileError
         }),
         {
           status: 500,
@@ -134,6 +139,8 @@ serve(async (req) => {
         }
       );
     }
+
+    console.log("Successfully updated profile:", profileData);
 
     // Create subscription record in a real app, we would store the subscription
     // details here along with expiry dates, etc.
@@ -164,6 +171,7 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({
         error: error.message || "An unexpected error occurred",
+        stack: error.stack
       }),
       {
         status: 500,

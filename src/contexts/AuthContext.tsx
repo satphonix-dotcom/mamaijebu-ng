@@ -27,6 +27,27 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isAdmin, setIsAdmin] = useState(false);
   const [isPremium, setIsPremium] = useState(false);
 
+  // Function to fetch user profile
+  const fetchUserProfile = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single();
+
+      if (error) {
+        console.error('Error fetching profile:', error);
+        return null;
+      }
+      
+      return data;
+    } catch (error) {
+      console.error('Unexpected error fetching profile:', error);
+      return null;
+    }
+  };
+
   useEffect(() => {
     const getSession = async () => {
       setIsLoading(true);
@@ -39,18 +60,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           setUser(session?.user ?? null);
 
           if (session?.user) {
-            const { data: profile, error: profileError } = await supabase
-              .from('profiles')
-              .select('*')
-              .eq('id', session.user.id)
-              .single();
-
-            if (profileError) {
-              console.error('Error fetching profile:', profileError);
-            } else {
-              setProfile(profile);
-              setIsAdmin(profile?.is_admin || false);
-              setIsPremium(profile?.is_premium || false);
+            const profileData = await fetchUserProfile(session.user.id);
+            
+            if (profileData) {
+              setProfile(profileData);
+              setIsAdmin(profileData.is_admin || false);
+              setIsPremium(profileData.is_premium || false);
             }
           }
         }
@@ -64,25 +79,18 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     getSession();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
+      async (_event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
 
         if (session?.user) {
-          supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', session.user.id)
-            .single()
-            .then(({ data, error }) => {
-              if (error) {
-                console.error('Error fetching profile:', error);
-              } else {
-                setProfile(data);
-                setIsAdmin(data?.is_admin || false);
-                setIsPremium(data?.is_premium || false);
-              }
-            });
+          const profileData = await fetchUserProfile(session.user.id);
+          
+          if (profileData) {
+            setProfile(profileData);
+            setIsAdmin(profileData.is_admin || false);
+            setIsPremium(profileData.is_premium || false);
+          }
         } else {
           setProfile(null);
           setIsAdmin(false);
@@ -138,6 +146,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     if (!user) return false;
     
     try {
+      console.log('Upgrading user to premium:', user.id);
+      
+      // First, update the database
       const { data, error } = await supabase
         .from('profiles')
         .update({ is_premium: true })
@@ -145,10 +156,30 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         .select()
         .single();
       
-      if (error) throw error;
+      if (error) {
+        console.error('Error updating premium status in database:', error);
+        throw error;
+      }
       
+      console.log('Database updated successfully:', data);
+      
+      // Then update local state
       setProfile(data);
       setIsPremium(true);
+      
+      // Double-check by fetching the latest profile
+      const latestProfile = await fetchUserProfile(user.id);
+      if (latestProfile) {
+        console.log('Fetched latest profile:', latestProfile);
+        setProfile(latestProfile);
+        setIsPremium(latestProfile.is_premium || false);
+        
+        if (!latestProfile.is_premium) {
+          console.warn('Profile was not updated to premium in the database!');
+          return false;
+        }
+      }
+      
       return true;
     } catch (error) {
       console.error('Error upgrading to premium:', error);
