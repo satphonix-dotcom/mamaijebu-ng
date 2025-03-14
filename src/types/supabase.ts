@@ -1,3 +1,4 @@
+
 import { Database } from '@/integrations/supabase/types';
 
 // Export the Database type
@@ -38,7 +39,16 @@ export type LottoDrawUpdate = Database['public']['Tables']['lotto_draws']['Updat
 export type CountryUpdate = Database['public']['Tables']['countries']['Update'];
 export type LottoTypeUpdate = Database['public']['Tables']['lotto_types']['Update'];
 
-// Add new type for subscription plans
-export type SubscriptionPlan = Database['public']['Tables']['subscription_plans']['Row'];
-export type SubscriptionPlanInsert = Database['public']['Tables']['subscription_plans']['Insert'];
-export type SubscriptionPlanUpdate = Database['public']['Tables']['subscription_plans']['Update'];
+// Add custom types for subscription plans
+export type SubscriptionPlan = {
+  id: string;
+  name: string;
+  period: 'monthly' | 'quarterly' | 'yearly';
+  price: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+};
+
+export type SubscriptionPlanInsert = Omit<SubscriptionPlan, 'id' | 'created_at' | 'updated_at'>;
+export type SubscriptionPlanUpdate = Partial<SubscriptionPlanInsert>;

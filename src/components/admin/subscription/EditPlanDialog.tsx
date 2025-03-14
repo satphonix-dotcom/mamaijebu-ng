@@ -5,18 +5,18 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { SubscriptionPlan } from "@/types/supabase";
+import { SubscriptionPlan, SubscriptionPlanInsert, SubscriptionPlanUpdate } from "@/types/supabase";
 
 interface EditPlanDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   plan: SubscriptionPlan | null;
-  onSave: (plan: Omit<SubscriptionPlan, 'id'> & { id?: string }) => Promise<void>;
+  onSave: (plan: SubscriptionPlanInsert & { id?: string }) => Promise<void>;
 }
 
 export function EditPlanDialog({ isOpen, onOpenChange, plan, onSave }: EditPlanDialogProps) {
   const [name, setName] = useState<string>(plan?.name || "");
-  const [period, setPeriod] = useState<string>(plan?.period || "monthly");
+  const [period, setPeriod] = useState<'monthly' | 'quarterly' | 'yearly'>(plan?.period || "monthly");
   const [price, setPrice] = useState<string>(plan ? ((plan.price / 100).toFixed(2)) : "19.99");
   const [isSaving, setIsSaving] = useState(false);
 
@@ -75,7 +75,7 @@ export function EditPlanDialog({ isOpen, onOpenChange, plan, onSave }: EditPlanD
             <Label htmlFor="period" className="text-right">
               Period
             </Label>
-            <Select value={period} onValueChange={setPeriod}>
+            <Select value={period} onValueChange={(value: 'monthly' | 'quarterly' | 'yearly') => setPeriod(value)}>
               <SelectTrigger className="col-span-3">
                 <SelectValue placeholder="Select period" />
               </SelectTrigger>

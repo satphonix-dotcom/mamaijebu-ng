@@ -3,94 +3,44 @@ import { useEffect, useState } from "react";
 import { AdminLayout } from "@/components/AdminLayout";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
-import { useToast } from "@/components/ui/use-toast";
-import { supabase } from "@/integrations/supabase/client";
 import { SubscriptionPlan } from "@/types/supabase";
 import { EditPlanDialog } from "@/components/admin/subscription/EditPlanDialog";
 import { SubscriptionPlansTable } from "@/components/admin/subscription/SubscriptionPlansTable";
+import { useSubscriptionPlans } from "@/hooks/useSubscriptionPlans";
 
 export default function SubscriptionPlans() {
-  const [plans, setPlans] = useState<SubscriptionPlan[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [selectedPlan, setSelectedPlan] = useState<SubscriptionPlan | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const { toast } = useToast();
-
-  const fetchPlans = async () => {
-    setIsLoading(true);
-    try {
-      const { data, error } = await supabase
-        .from('subscription_plans')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      setPlans(data || []);
-    } catch (error) {
-      console.error('Error fetching plans:', error);
-      toast({
-        title: 'Failed to load subscription plans',
-        description: 'Please try again later.',
-        variant: 'destructive',
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const { plans, isLoading, fetchPlans, createPlan, updatePlan, deletePlan } = useSubscriptionPlans();
 
   useEffect(() => {
     fetchPlans();
   }, []);
 
-  const handleSavePlan = async (planData: Omit<SubscriptionPlan, 'id'> & { id?: string }) => {
+  const handleSavePlan = async (planData: any) => {
     try {
       if (planData.id) {
         // Update existing plan
-        const { error } = await supabase
-          .from('subscription_plans')
-          .update({
-            name: planData.name,
-            period: planData.period,
-            price: planData.price,
-            is_active: planData.is_active,
-          })
-          .eq('id', planData.id);
-
-        if (error) throw error;
-
-        toast({
-          title: 'Plan updated',
-          description: 'The subscription plan has been updated successfully.',
+        await updatePlan(planData.id, {
+          name: planData.name,
+          period: planData.period,
+          price: planData.price,
+          is_active: planData.is_active,
         });
       } else {
         // Create new plan
-        const { error } = await supabase
-          .from('subscription_plans')
-          .insert({
-            name: planData.name,
-            period: planData.period,
-            price: planData.price,
-            is_active: true,
-          });
-
-        if (error) throw error;
-
-        toast({
-          title: 'Plan created',
-          description: 'New subscription plan has been created successfully.',
+        await createPlan({
+          name: planData.name,
+          period: planData.period,
+          price: planData.price,
+          is_active: true,
         });
       }
-
-      await fetchPlans();
+      
       setIsEditDialogOpen(false);
       setSelectedPlan(null);
     } catch (error) {
       console.error('Error saving plan:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to save the subscription plan.',
-        variant: 'destructive',
-      });
     }
   };
 
@@ -99,28 +49,7 @@ export default function SubscriptionPlans() {
       return;
     }
 
-    try {
-      const { error } = await supabase
-        .from('subscription_plans')
-        .delete()
-        .eq('id', plan.id);
-
-      if (error) throw error;
-
-      toast({
-        title: 'Plan deleted',
-        description: 'The subscription plan has been deleted successfully.',
-      });
-
-      await fetchPlans();
-    } catch (error) {
-      console.error('Error deleting plan:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to delete the subscription plan.',
-        variant: 'destructive',
-      });
-    }
+    await deletePlan(plan.id);
   };
 
   return (
