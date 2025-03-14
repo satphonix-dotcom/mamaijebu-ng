@@ -75,7 +75,10 @@ export default function Countries() {
       
       if (error) throw error;
       
-      setCountries([...(data || []), ...countries]);
+      if (data) {
+        setCountries(prevCountries => [...data, ...prevCountries]);
+      }
+      
       setIsDialogOpen(false);
       setCountryName('');
       setCountryCode('');
@@ -103,6 +106,26 @@ export default function Countries() {
     if (!countryToDelete) return;
 
     try {
+      // First check if the country is referenced by any games
+      const { data: games, error: gamesError } = await supabase
+        .from('lotto_games')
+        .select('id')
+        .eq('country_id', countryToDelete)
+        .limit(1);
+      
+      if (gamesError) throw gamesError;
+      
+      if (games && games.length > 0) {
+        toast({
+          title: 'Cannot Delete Country',
+          description: 'This country is used by one or more games. Delete those games first.',
+          variant: 'destructive',
+        });
+        setIsDeleteDialogOpen(false);
+        setCountryToDelete(null);
+        return;
+      }
+      
       const { error } = await supabase
         .from('countries')
         .delete()
@@ -111,9 +134,9 @@ export default function Countries() {
       if (error) throw error;
 
       // Update local state
-      setCountries(countries.filter(country => country.id !== countryToDelete));
-      setCountryToDelete(null);
+      setCountries(prevCountries => prevCountries.filter(country => country.id !== countryToDelete));
       setIsDeleteDialogOpen(false);
+      setCountryToDelete(null);
 
       toast({
         title: 'Success',

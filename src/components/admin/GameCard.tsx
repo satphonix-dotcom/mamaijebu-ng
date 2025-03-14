@@ -18,7 +18,7 @@ export function GameCard({ game, onDelete }: GameCardProps) {
       <CardHeader>
         <CardTitle>{game.name}</CardTitle>
         <CardDescription>
-          {game.countries?.name} - {game.lotto_types?.name}
+          {game.countries?.name || 'No country'} - {game.lotto_types?.name || 'No type'}
         </CardDescription>
       </CardHeader>
       <CardContent>

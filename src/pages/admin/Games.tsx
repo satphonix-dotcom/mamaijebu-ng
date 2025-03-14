@@ -69,8 +69,9 @@ export default function Games() {
   };
 
   const handleGameAdded = (newGame: any) => {
-    setGames([...(newGame as any), ...games]);
-    fetchData(); // Refresh data to ensure consistency
+    // Remove this line as it's causing issues with adding newly created games
+    // setGames([...(newGame as any), ...games]);
+    fetchData(); // Just refresh data to ensure consistency
   };
 
   const handleDeleteGame = async (id: string) => {
@@ -101,8 +102,8 @@ export default function Games() {
 
       if (error) throw error;
 
-      // Update local state
-      setGames(games.filter(game => game.id !== id));
+      // Update local state - make sure this is properly filtering the deleted game
+      setGames(prevGames => prevGames.filter(game => game.id !== id));
 
       toast({
         title: 'Success',
@@ -123,14 +124,16 @@ export default function Games() {
       <div className="container mx-auto py-10">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold">Lotto Games</h1>
-          <GameFormDialog 
-            countries={countries}
-            lottoTypes={lottoTypes}
-            onGameAdded={handleGameAdded}
-            isOpen={isDialogOpen}
-            onOpenChange={setIsDialogOpen}
-          />
+          <Button onClick={() => setIsDialogOpen(true)}>Add New Game</Button>
         </div>
+
+        <GameFormDialog 
+          countries={countries}
+          lottoTypes={lottoTypes}
+          onGameAdded={handleGameAdded}
+          isOpen={isDialogOpen}
+          onOpenChange={setIsDialogOpen}
+        />
 
         <GamesGrid 
           games={games} 
