@@ -58,7 +58,7 @@ export function ThreeRowNumbersSearch() {
   }, []);
 
   return (
-    <div className={`space-y-6 ${isMobile ? 'px-0' : ''}`}>
+    <div className="space-y-6">
       <ThreeRowSearchForm 
         lottoTypes={lottoTypes}
         games={games}
