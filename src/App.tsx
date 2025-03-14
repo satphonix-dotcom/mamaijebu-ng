@@ -8,17 +8,16 @@ import Search from '@/pages/Search';
 import PremiumSubscription from '@/pages/PremiumSubscription';
 import PremiumConfirmation from '@/pages/PremiumConfirmation';
 import GameSearch from '@/pages/GameSearch';
-import Admin from '@/pages/Admin';
-import AdminDashboard from '@/pages/AdminDashboard';
+import NotFound from '@/pages/NotFound';
+import { AuthProvider } from '@/contexts/AuthContext';
+import { Toaster } from '@/components/ui/toaster';
 import Games from '@/pages/admin/Games';
 import Draws from '@/pages/admin/Draws';
 import Countries from '@/pages/admin/Countries';
 import LottoTypes from '@/pages/admin/LottoTypes';
 import Users from '@/pages/admin/Users';
-import NotFound from '@/pages/NotFound';
-import { AuthProvider } from '@/contexts/AuthContext';
-import { Toaster } from '@/components/ui/toaster';
 import SubscriptionPlans from './pages/admin/SubscriptionPlans';
+import { AdminLayout } from './components/AdminLayout';
 
 function App() {
   return (
@@ -32,8 +31,8 @@ function App() {
           <Route path="/premium" element={<PremiumSubscription />} />
           <Route path="/premium-confirmation" element={<PremiumConfirmation />} />
           <Route path="/game-search/:id" element={<GameSearch />} />
-          <Route path="/admin" element={<Admin />} />
-          <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route path="/admin" element={<AdminLayout><div className="p-8">Welcome to Admin Dashboard</div></AdminLayout>} />
+          <Route path="/admin/dashboard" element={<AdminLayout><div className="p-8">Admin Dashboard</div></AdminLayout>} />
           <Route path="/admin/games" element={<Games />} />
           <Route path="/admin/draws" element={<Draws />} />
           <Route path="/admin/countries" element={<Countries />} />
