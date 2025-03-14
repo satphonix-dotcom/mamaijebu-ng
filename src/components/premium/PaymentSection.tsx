@@ -16,7 +16,7 @@ export const PaymentSection = ({ isLoading, isLoadingPlan, priceDisplay, onPayme
       <div className="bg-gray-50 p-4 rounded-lg border mt-8">
         <h3 className="font-bold mb-2">Payment Information</h3>
         <p className="text-gray-600 mb-4">
-          Secure payment is processed via Paystack. Pay once and get permanent access to all premium features - no subscriptions or recurring charges.
+          Secure payment is processed via Paystack. Pay once and get access to all premium features - no subscriptions or recurring charges.
         </p>
       </div>
       <CardFooter className="flex flex-col items-center">

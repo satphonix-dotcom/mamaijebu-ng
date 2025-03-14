@@ -68,7 +68,7 @@ export const PlanComparison = ({ premiumPrice }: { premiumPrice: string }) => {
         </ul>
         <div className="mt-6 text-center">
           <p className="text-xl font-bold mb-2">{premiumPrice}</p>
-          <p className="text-green-600">One-time Payment (Permanent Access)</p>
+          <p className="text-green-600">One-time Payment</p>
         </div>
       </div>
     </div>
