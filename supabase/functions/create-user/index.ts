@@ -20,7 +20,7 @@ serve(async (req) => {
     // Initialize Supabase client with service role key
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
-    const { email, password, is_admin } = await req.json();
+    const { email, password, is_admin, is_premium } = await req.json();
 
     if (!email || !password) {
       return new Response(
@@ -71,10 +71,13 @@ serve(async (req) => {
     const userId = authData.user.id;
 
     // The profile should be created automatically via the database trigger
-    // But we'll update it with the is_admin flag
+    // But we'll update it with the is_admin and is_premium flags
     const { data: profileData, error: profileError } = await supabase
       .from("profiles")
-      .update({ is_admin })
+      .update({ 
+        is_admin: is_admin !== undefined ? is_admin : false,
+        is_premium: is_premium !== undefined ? is_premium : false
+      })
       .eq("id", userId)
       .select()
       .single();

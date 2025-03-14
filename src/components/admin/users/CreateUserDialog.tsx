@@ -17,12 +17,14 @@ export function CreateUserDialog({ isOpen, onOpenChange, onSave }: CreateUserDia
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
+  const [isPremium, setIsPremium] = useState<boolean>(false);
   const [isSaving, setIsSaving] = useState(false);
 
   const resetForm = () => {
     setEmail("");
     setPassword("");
     setIsAdmin(false);
+    setIsPremium(false);
   };
 
   const handleOpenChange = (open: boolean) => {
@@ -39,6 +41,7 @@ export function CreateUserDialog({ isOpen, onOpenChange, onSave }: CreateUserDia
         email,
         password,
         is_admin: isAdmin,
+        is_premium: isPremium,
       });
       resetForm();
     } finally {
@@ -91,6 +94,21 @@ export function CreateUserDialog({ isOpen, onOpenChange, onSave }: CreateUserDia
               />
               <Label htmlFor="new-isAdmin" className="font-normal">
                 User has admin privileges
+              </Label>
+            </div>
+          </div>
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="new-isPremium" className="text-right">
+              Premium
+            </Label>
+            <div className="flex items-center space-x-2 col-span-3">
+              <Checkbox
+                id="new-isPremium"
+                checked={isPremium}
+                onCheckedChange={(checked) => setIsPremium(checked === true)}
+              />
+              <Label htmlFor="new-isPremium" className="font-normal">
+                User has premium access
               </Label>
             </div>
           </div>
