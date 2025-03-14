@@ -24,7 +24,7 @@ export function SubscriptionPlansTable({
           <TableRow>
             <TableHead>Name</TableHead>
             <TableHead>Period</TableHead>
-            <TableHead className="text-right">Price (USD)</TableHead>
+            <TableHead className="text-right">Price (₦)</TableHead>
             <TableHead className="text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
@@ -46,7 +46,7 @@ export function SubscriptionPlansTable({
                    plan.period === 'quarterly' ? 'Quarterly' : 
                    plan.period === 'yearly' ? 'Yearly' : plan.period}
                 </TableCell>
-                <TableCell className="text-right">${(plan.price / 100).toFixed(2)}</TableCell>
+                <TableCell className="text-right">₦{(plan.price / 100).toFixed(2)}</TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end gap-2">
                     <Button 

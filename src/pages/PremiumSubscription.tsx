@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Layout } from "@/components/Layout";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -76,7 +75,7 @@ const PremiumSubscription = () => {
         body: {
           userId: user.id,
           userEmail: profile?.email || user.email,
-          amount: 1999, // $19.99 in USD
+          amount: 7999.99, // ₦7,999.99 in NGN
           callbackUrl: window.location.origin + '/premium-confirmation'
         }
       });
@@ -150,7 +149,7 @@ const PremiumSubscription = () => {
                   </li>
                 </ul>
                 <div className="mt-6 text-center">
-                  <p className="text-xl font-bold mb-2">$0</p>
+                  <p className="text-xl font-bold mb-2">₦0</p>
                   <p className="text-gray-500">Current Plan</p>
                 </div>
               </div>
@@ -186,7 +185,7 @@ const PremiumSubscription = () => {
                   </li>
                 </ul>
                 <div className="mt-6 text-center">
-                  <p className="text-xl font-bold mb-2">$19.99</p>
+                  <p className="text-xl font-bold mb-2">₦7,999.99</p>
                   <p className="text-green-600">Lifetime Access</p>
                 </div>
               </div>
@@ -212,7 +211,7 @@ const PremiumSubscription = () => {
                   Processing...
                 </>
               ) : (
-                "Upgrade to Premium ($19.99)"
+                "Upgrade to Premium (₦7,999.99)"
               )}
             </Button>
             <p className="text-xs text-gray-500">

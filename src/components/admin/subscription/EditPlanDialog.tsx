@@ -17,7 +17,7 @@ interface EditPlanDialogProps {
 export function EditPlanDialog({ isOpen, onOpenChange, plan, onSave }: EditPlanDialogProps) {
   const [name, setName] = useState<string>(plan?.name || "");
   const [period, setPeriod] = useState<'monthly' | 'quarterly' | 'yearly'>(plan?.period || "monthly");
-  const [price, setPrice] = useState<string>(plan ? ((plan.price / 100).toFixed(2)) : "19.99");
+  const [price, setPrice] = useState<string>(plan ? ((plan.price / 100).toFixed(2)) : "7999.99");
   const [isSaving, setIsSaving] = useState(false);
 
   // Update form state when plan prop changes
@@ -30,21 +30,21 @@ export function EditPlanDialog({ isOpen, onOpenChange, plan, onSave }: EditPlanD
       // Default values for new plan
       setName("");
       setPeriod("monthly");
-      setPrice("19.99");
+      setPrice("7999.99");
     }
   }, [plan]);
 
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      // Convert price from dollars to cents for storage
-      const priceInCents = Math.round(parseFloat(price) * 100);
+      // Convert price from naira to kobo for storage
+      const priceInKobo = Math.round(parseFloat(price) * 100);
       
       await onSave({
         id: plan?.id,
         name,
         period,
-        price: priceInCents,
+        price: priceInKobo,
         is_active: plan?.is_active ?? true,
       });
     } finally {
@@ -88,10 +88,10 @@ export function EditPlanDialog({ isOpen, onOpenChange, plan, onSave }: EditPlanD
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="price" className="text-right">
-              Price (USD)
+              Price (₦)
             </Label>
             <div className="relative col-span-3">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2">$</span>
+              <span className="absolute left-3 top-1/2 -translate-y-1/2">₦</span>
               <Input
                 id="price"
                 type="number"

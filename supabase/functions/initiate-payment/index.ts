@@ -60,6 +60,7 @@ serve(async (req) => {
       body: JSON.stringify({
         email: userEmail,
         amount: amount * 100, // Paystack requires amount in kobo (smallest currency unit)
+        currency: "NGN", // Set currency to Naira
         callback_url: callbackUrl || `${req.headers.get("origin")}/premium-confirmation`,
         metadata: {
           userId: userId,
