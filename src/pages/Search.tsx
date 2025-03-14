@@ -15,11 +15,11 @@ export default function Search() {
         <h1 className="text-3xl font-bold mb-6">Lottery Search Tools</h1>
         
         <Tabs defaultValue="single">
-          <TabsList className="mb-6 w-full max-w-md grid grid-cols-4 gap-2">
-            <TabsTrigger value="single" className="px-3 py-2">Single Numbers</TabsTrigger>
-            <TabsTrigger value="pattern" className="px-3 py-2">Number Pattern</TabsTrigger>
-            <TabsTrigger value="onerow" className="px-3 py-2">One Row Numbers</TabsTrigger>
-            <TabsTrigger value="tworow" className="px-3 py-2">Two Row Numbers</TabsTrigger>
+          <TabsList className="mb-6 w-full max-w-3xl grid grid-cols-4 gap-4">
+            <TabsTrigger value="single" className="px-2 py-2 text-sm md:text-base md:px-4">Single Numbers</TabsTrigger>
+            <TabsTrigger value="pattern" className="px-2 py-2 text-sm md:text-base md:px-4">Number Pattern</TabsTrigger>
+            <TabsTrigger value="onerow" className="px-2 py-2 text-sm md:text-base md:px-4">One Row Numbers</TabsTrigger>
+            <TabsTrigger value="tworow" className="px-2 py-2 text-sm md:text-base md:px-4">Two Row Numbers</TabsTrigger>
           </TabsList>
           
           <TabsContent value="single">
