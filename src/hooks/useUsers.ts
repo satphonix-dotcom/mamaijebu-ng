@@ -12,12 +12,15 @@ export function useUsers() {
   const fetchUsers = async () => {
     setIsLoading(true);
     try {
+      console.log('Fetching users from Supabase');
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
+      
+      console.log('Fetched users:', data?.length || 0);
       setUsers(data || []);
     } catch (error) {
       console.error('Error fetching users:', error);
@@ -141,7 +144,7 @@ export function useUsers() {
       console.log('User creation successful:', responseData);
       
       if (responseData.user) {
-        // Instead of just adding to the local state, let's refetch all users to ensure consistency
+        // Explicitly fetch all users to ensure we have the latest data
         await fetchUsers();
         toast({
           title: 'User created',

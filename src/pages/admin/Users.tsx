@@ -9,13 +9,16 @@ import { EditUserDialog } from '@/components/admin/users/EditUserDialog';
 import { CreateUserDialog } from '@/components/admin/users/CreateUserDialog';
 import { UsersTable } from '@/components/admin/users/UsersTable';
 import { useUsers } from '@/hooks/useUsers';
+import { useToast } from '@/components/ui/use-toast';
 
 export default function Users() {
   const { users, isLoading, fetchUsers, deleteUser, updateUser, createUser } = useUsers();
   const [userToDelete, setUserToDelete] = useState<Profile | null>(null);
   const [userToEdit, setUserToEdit] = useState<Profile | null>(null);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const { toast } = useToast();
 
+  // Fetch users on initial mount
   useEffect(() => {
     fetchUsers();
   }, []);
@@ -40,11 +43,21 @@ export default function Users() {
     const success = await createUser(newUser);
     if (success) {
       setIsCreateDialogOpen(false);
+      // Force a refresh after creating a new user
+      await fetchUsers();
+      toast({
+        title: 'User list updated',
+        description: 'The user list has been refreshed with the latest data.'
+      });
     }
   };
 
-  const handleRefresh = () => {
-    fetchUsers();
+  const handleRefresh = async () => {
+    await fetchUsers();
+    toast({
+      title: 'User list refreshed',
+      description: 'The user list has been updated with the latest data.'
+    });
   };
 
   return (
