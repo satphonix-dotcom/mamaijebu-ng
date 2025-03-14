@@ -156,7 +156,15 @@ export default function GameSearch() {
 }
 
 // Game Card Component
-function GameCard({ game }: { game: LottoGame }) {
+interface GameWithRelations extends LottoGame {
+  countries?: { id: string; name: string; code: string };
+  lotto_types?: { id: string; name: string; description: string };
+}
+
+function GameCard({ game }: { game: GameWithRelations }) {
+  const countryName = game.countries?.name || 'Unknown';
+  const lottoTypeName = game.lotto_types?.name || 'Unknown';
+  
   return (
     <Card>
       <CardHeader className="pb-2">
@@ -169,10 +177,10 @@ function GameCard({ game }: { game: LottoGame }) {
           </p>
           <div className="grid grid-cols-2 gap-2 text-sm">
             <div>
-              <span className="font-medium">Country:</span> {game.countries?.name || 'Unknown'}
+              <span className="font-medium">Country:</span> {countryName}
             </div>
             <div>
-              <span className="font-medium">Type:</span> {game.lotto_types?.name || 'Unknown'}
+              <span className="font-medium">Type:</span> {lottoTypeName}
             </div>
             <div>
               <span className="font-medium">Balls:</span> {game.ball_count}
