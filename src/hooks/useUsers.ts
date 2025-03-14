@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Profile } from '@/types/supabase';
@@ -14,10 +13,9 @@ export function useUsers() {
     try {
       console.log('Fetching users from Supabase');
       
-      // Make sure we're fetching with the right service role to bypass RLS
+      // Use RPC function to fetch all profiles to bypass RLS
       const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
+        .rpc('get_all_profiles')
         .order('created_at', { ascending: false });
 
       if (error) {
