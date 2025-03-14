@@ -12,14 +12,21 @@ export function useSubscriptionPlans() {
   const fetchPlans = async () => {
     setIsLoading(true);
     try {
-      const { data, error } = await supabase
+      // Use any to bypass the type checking for the table name
+      const { data, error } = await (supabase as any)
         .from('subscription_plans')
         .select('*')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
       
-      setPlans(data || []);
+      // Cast the period string to our union type
+      const typedPlans = (data || []).map(plan => ({
+        ...plan,
+        period: plan.period as 'monthly' | 'quarterly' | 'yearly'
+      }));
+      
+      setPlans(typedPlans);
     } catch (error) {
       console.error('Error fetching subscription plans:', error);
       toast({
@@ -34,7 +41,8 @@ export function useSubscriptionPlans() {
 
   const createPlan = async (planData: SubscriptionPlanInsert) => {
     try {
-      const { data, error } = await supabase
+      // Use any to bypass the type checking for the table name
+      const { data, error } = await (supabase as any)
         .from('subscription_plans')
         .insert([planData])
         .select()
@@ -42,14 +50,20 @@ export function useSubscriptionPlans() {
 
       if (error) throw error;
       
-      setPlans([data, ...plans]);
+      // Cast the period string to our union type
+      const typedPlan = {
+        ...data,
+        period: data.period as 'monthly' | 'quarterly' | 'yearly'
+      };
+      
+      setPlans([typedPlan, ...plans]);
       
       toast({
         title: 'Plan created',
         description: 'New subscription plan has been created successfully.',
       });
       
-      return data;
+      return typedPlan;
     } catch (error) {
       console.error('Error creating subscription plan:', error);
       toast({
@@ -63,7 +77,8 @@ export function useSubscriptionPlans() {
 
   const updatePlan = async (id: string, planData: SubscriptionPlanUpdate) => {
     try {
-      const { data, error } = await supabase
+      // Use any to bypass the type checking for the table name
+      const { data, error } = await (supabase as any)
         .from('subscription_plans')
         .update(planData)
         .eq('id', id)
@@ -72,14 +87,20 @@ export function useSubscriptionPlans() {
 
       if (error) throw error;
       
-      setPlans(plans.map(plan => plan.id === id ? data : plan));
+      // Cast the period string to our union type
+      const typedPlan = {
+        ...data,
+        period: data.period as 'monthly' | 'quarterly' | 'yearly'
+      };
+      
+      setPlans(plans.map(plan => plan.id === id ? typedPlan : plan));
       
       toast({
         title: 'Plan updated',
         description: 'The subscription plan has been updated successfully.',
       });
       
-      return data;
+      return typedPlan;
     } catch (error) {
       console.error('Error updating subscription plan:', error);
       toast({
@@ -93,7 +114,8 @@ export function useSubscriptionPlans() {
 
   const deletePlan = async (id: string) => {
     try {
-      const { error } = await supabase
+      // Use any to bypass the type checking for the table name
+      const { error } = await (supabase as any)
         .from('subscription_plans')
         .delete()
         .eq('id', id);

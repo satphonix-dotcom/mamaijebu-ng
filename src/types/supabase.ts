@@ -39,7 +39,7 @@ export type LottoDrawUpdate = Database['public']['Tables']['lotto_draws']['Updat
 export type CountryUpdate = Database['public']['Tables']['countries']['Update'];
 export type LottoTypeUpdate = Database['public']['Tables']['lotto_types']['Update'];
 
-// Add custom types for subscription plans
+// Define custom types for subscription plans
 export type SubscriptionPlan = {
   id: string;
   name: string;

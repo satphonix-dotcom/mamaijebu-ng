@@ -1,27 +1,28 @@
+
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
-import { Index } from '@/pages';
-import { Login } from '@/pages/Login';
-import { Dashboard } from '@/pages/Dashboard';
-import { Search } from '@/pages/Search';
-import { PremiumSubscription } from '@/pages/PremiumSubscription';
-import { PremiumConfirmation } from '@/pages/PremiumConfirmation';
-import { GameSearch } from '@/pages/GameSearch';
-import { Admin } from '@/pages/Admin';
-import { AdminDashboard } from '@/pages/AdminDashboard';
-import { Games } from '@/pages/admin/Games';
-import { Draws } from '@/pages/admin/Draws';
-import { Countries } from '@/pages/admin/Countries';
-import { LottoTypes } from '@/pages/admin/LottoTypes';
-import { Users } from '@/pages/admin/Users';
-import { NotFound } from '@/pages/NotFound';
+import Index from '@/pages/Index';
+import Login from '@/pages/Login';
+import Dashboard from '@/pages/Dashboard';
+import Search from '@/pages/Search';
+import PremiumSubscription from '@/pages/PremiumSubscription';
+import PremiumConfirmation from '@/pages/PremiumConfirmation';
+import GameSearch from '@/pages/GameSearch';
+import Admin from '@/pages/Admin';
+import AdminDashboard from '@/pages/AdminDashboard';
+import Games from '@/pages/admin/Games';
+import Draws from '@/pages/admin/Draws';
+import Countries from '@/pages/admin/Countries';
+import LottoTypes from '@/pages/admin/LottoTypes';
+import Users from '@/pages/admin/Users';
+import NotFound from '@/pages/NotFound';
 import { AuthProvider } from '@/contexts/AuthContext';
-import { ToastProvider } from '@/hooks/use-toast';
+import { Toaster } from '@/components/ui/toaster';
 import SubscriptionPlans from './pages/admin/SubscriptionPlans';
 
 function App() {
   return (
-    <ToastProvider>
+    <>
       <AuthProvider>
         <Routes>
           <Route path="/" element={<Index />} />
@@ -42,7 +43,8 @@ function App() {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </AuthProvider>
-    </ToastProvider>
+      <Toaster />
+    </>
   );
 }
 
