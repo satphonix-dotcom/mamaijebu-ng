@@ -90,12 +90,20 @@ export function useUsers() {
     try {
       const { email, password, is_admin } = newUser;
       
-      // Call our edge function to create the user
-      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-user`, {
+      // Get the correct base URL from environment variables
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+      
+      if (!supabaseUrl) {
+        throw new Error('Supabase URL not configured');
+      }
+      
+      // Call our edge function to create the user with the full URL
+      const response = await fetch(`${supabaseUrl}/functions/v1/create-user`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`
+          'Authorization': `Bearer ${supabaseAnonKey}`
         },
         body: JSON.stringify({
           email,
@@ -105,14 +113,21 @@ export function useUsers() {
       });
       
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to create user');
+        // Properly handle non-200 response
+        let errorMessage = 'Failed to create user';
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.error || errorMessage;
+        } catch (e) {
+          console.error('Could not parse error response:', e);
+        }
+        throw new Error(errorMessage);
       }
       
-      const { user } = await response.json();
+      const responseData = await response.json();
       
-      if (user) {
-        setUsers([user, ...users]);
+      if (responseData.user) {
+        setUsers([responseData.user, ...users]);
         toast({
           title: 'User created',
           description: 'New user has been successfully created with authentication.',
