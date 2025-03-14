@@ -1,6 +1,4 @@
 
-// Update the ThreeRowSearchForm with mobile-friendly styles
-// This will be similar to the existing form but with responsive layout changes
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -104,7 +102,12 @@ export function ThreeRowSearchForm({
               onChange={(e) => handleChange(index, e.target.value)}
               type="number"
               min="1"
+              max="99"
               placeholder={(index + 1).toString()}
+              style={{ 
+                appearance: 'textfield',
+                width: '100%' 
+              }}
             />
           ))}
         </div>
@@ -114,7 +117,7 @@ export function ThreeRowSearchForm({
 
   return (
     <Card>
-      <CardContent className={`${isMobile ? 'p-4' : 'pt-6'}`}>
+      <CardContent className={`${isMobile ? 'p-3' : 'pt-6'}`}>
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* First Row of Numbers */}
           {renderNumberInputs(firstRowNumbers, handleFirstRowNumberChange, "First Row Numbers")}
