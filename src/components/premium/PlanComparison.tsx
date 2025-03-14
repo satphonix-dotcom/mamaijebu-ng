@@ -1,7 +1,20 @@
 
 import { CheckCircle, XCircle, Crown } from "lucide-react";
+import { SubscriptionPlan } from "@/types/supabase";
 
-export const PlanComparison = ({ premiumPrice }: { premiumPrice: string }) => {
+interface PlanComparisonProps {
+  selectedPlan: SubscriptionPlan;
+}
+
+export const PlanComparison = ({ selectedPlan }: PlanComparisonProps) => {
+  // Format period display
+  const periodDisplay = selectedPlan.period === 'monthly' ? 'Monthly' : 
+                        selectedPlan.period === 'quarterly' ? 'Quarterly' : 
+                        selectedPlan.period === 'yearly' ? 'Yearly' : selectedPlan.period;
+
+  // Format price for display
+  const priceDisplay = `₦${(selectedPlan.price / 100).toLocaleString('en-NG', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       <div className="border rounded-lg p-6">
@@ -42,7 +55,7 @@ export const PlanComparison = ({ premiumPrice }: { premiumPrice: string }) => {
         </div>
         <h3 className="font-bold mb-4 text-lg flex items-center gap-2 text-primary">
           <Crown className="h-5 w-5" />
-          Premium (One-time)
+          {selectedPlan.name}
         </h3>
         <ul className="space-y-3">
           <li className="flex items-start gap-2">
@@ -67,8 +80,8 @@ export const PlanComparison = ({ premiumPrice }: { premiumPrice: string }) => {
           </li>
         </ul>
         <div className="mt-6 text-center">
-          <p className="text-xl font-bold mb-2">{premiumPrice}</p>
-          <p className="text-green-600">One-time Payment</p>
+          <p className="text-xl font-bold mb-2">{priceDisplay}</p>
+          <p className="text-green-600">{periodDisplay}</p>
         </div>
       </div>
     </div>

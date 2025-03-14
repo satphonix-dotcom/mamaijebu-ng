@@ -92,8 +92,11 @@ serve(async (req) => {
       );
     }
 
-    // Extract the user ID from the metadata
+    // Extract the user ID and plan details from the metadata
     const userId = verifyData.data.metadata?.userId;
+    const planId = verifyData.data.metadata?.planId;
+    const planName = verifyData.data.metadata?.planName;
+    const planPeriod = verifyData.data.metadata?.planPeriod;
     
     if (!userId) {
       console.error("User ID not found in payment metadata");
@@ -111,7 +114,10 @@ serve(async (req) => {
     // Update the user's premium status in the database
     const { data: profileData, error: profileError } = await supabase
       .from("profiles")
-      .update({ is_premium: true })
+      .update({ 
+        is_premium: true,
+        // Could store subscription details here if needed
+      })
       .eq("id", userId)
       .select()
       .single();
@@ -129,6 +135,9 @@ serve(async (req) => {
       );
     }
 
+    // Create subscription record in a real app, we would store the subscription
+    // details here along with expiry dates, etc.
+
     console.log("Payment verified and user upgraded successfully:", userId);
 
     return new Response(
@@ -138,6 +147,11 @@ serve(async (req) => {
         data: {
           userId: userId,
           isPremium: true,
+          planDetails: {
+            id: planId,
+            name: planName,
+            period: planPeriod
+          }
         },
       }),
       {

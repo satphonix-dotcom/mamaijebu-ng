@@ -34,12 +34,12 @@ serve(async (req) => {
     // Initialize Supabase client with service role key
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
-    const { userId, userEmail, amount, callbackUrl } = await req.json();
+    const { userId, userEmail, amount, planId, planName, planPeriod, callbackUrl } = await req.json();
 
-    if (!userId || !userEmail || !amount) {
+    if (!userId || !userEmail || !amount || !planId) {
       return new Response(
         JSON.stringify({
-          error: "User ID, email, and amount are required",
+          error: "User ID, email, amount, and plan ID are required",
         }),
         {
           status: 400,
@@ -48,7 +48,7 @@ serve(async (req) => {
       );
     }
 
-    console.log(`Initiating payment for user ${userId} with email ${userEmail}`);
+    console.log(`Initiating payment for user ${userId} with email ${userEmail} for plan ${planName}`);
 
     // Prepare the request to Paystack API
     const paystackResponse = await fetch("https://api.paystack.co/transaction/initialize", {
@@ -64,6 +64,9 @@ serve(async (req) => {
         callback_url: callbackUrl || `${req.headers.get("origin")}/premium-confirmation`,
         metadata: {
           userId: userId,
+          planId: planId,
+          planName: planName,
+          planPeriod: planPeriod,
           custom_fields: [
             {
               display_name: "User ID",
@@ -71,9 +74,24 @@ serve(async (req) => {
               value: userId,
             },
             {
+              display_name: "Plan ID",
+              variable_name: "plan_id",
+              value: planId,
+            },
+            {
+              display_name: "Plan",
+              variable_name: "plan_name",
+              value: planName,
+            },
+            {
+              display_name: "Period",
+              variable_name: "plan_period",
+              value: planPeriod,
+            },
+            {
               display_name: "Purchase Type",
               variable_name: "purchase_type",
-              value: "premium_membership",
+              value: "premium_subscription",
             },
           ],
         },

@@ -7,16 +7,23 @@ interface PaymentSectionProps {
   isLoading: boolean;
   isLoadingPlan: boolean;
   priceDisplay: string;
+  planName: string;
+  planPeriod: string;
   onPaymentInitiate: () => Promise<void>;
 }
 
-export const PaymentSection = ({ isLoading, isLoadingPlan, priceDisplay, onPaymentInitiate }: PaymentSectionProps) => {
+export const PaymentSection = ({ isLoading, isLoadingPlan, priceDisplay, planName, planPeriod, onPaymentInitiate }: PaymentSectionProps) => {
+  // Format period display
+  const periodDisplay = planPeriod === 'monthly' ? 'Monthly' : 
+                        planPeriod === 'quarterly' ? 'Quarterly' : 
+                        planPeriod === 'yearly' ? 'Yearly' : planPeriod;
+  
   return (
     <>
       <div className="bg-gray-50 p-4 rounded-lg border mt-8">
         <h3 className="font-bold mb-2">Payment Information</h3>
         <p className="text-gray-600 mb-4">
-          Secure payment is processed via Paystack. Pay once and get access to all premium features - no subscriptions or recurring charges.
+          Secure payment is processed via Paystack. Subscribe to access all premium features.
         </p>
       </div>
       <CardFooter className="flex flex-col items-center">
@@ -37,7 +44,7 @@ export const PaymentSection = ({ isLoading, isLoadingPlan, priceDisplay, onPayme
               Loading plan...
             </>
           ) : (
-            `Upgrade to Premium (${priceDisplay}) - One-time Payment`
+            `Upgrade to ${planName} (${priceDisplay}) - ${periodDisplay}`
           )}
         </Button>
         <p className="text-xs text-gray-500">
