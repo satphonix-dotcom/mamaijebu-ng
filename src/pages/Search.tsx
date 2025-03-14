@@ -6,6 +6,7 @@ import { PatternNumberSearch } from '@/components/search/PatternNumberSearch';
 import { OneRowNumbersSearch } from '@/components/search/OneRowNumbersSearch';
 import { TwoRowNumbersSearch } from '@/components/search/TwoRowNumbersSearch';
 import { ThreeRowNumbersSearch } from '@/components/search/ThreeRowNumbersSearch';
+import { LappingNumbersSearch } from '@/components/search/LappingNumbersSearch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -38,6 +39,7 @@ export default function Search() {
     { id: "onerow", label: "One Row Numbers" },
     { id: "tworow", label: "Two Row Numbers" },
     { id: "threerow", label: "Three Row Numbers" },
+    { id: "lapping", label: "Lapping Numbers" },
   ];
 
   const renderTabContent = (id: string) => {
@@ -109,6 +111,20 @@ export default function Search() {
             </CardHeader>
             <CardContent>
               <ThreeRowNumbersSearch />
+            </CardContent>
+          </Card>
+        );
+      case "lapping":
+        return (
+          <Card>
+            <CardHeader>
+              <CardTitle>Lapping Numbers Search</CardTitle>
+              <CardDescription>
+                Search for lapping vertical sequence of numbers between two consecutive draws. Find where numbers appear in same positions across consecutive draws.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <LappingNumbersSearch />
             </CardContent>
           </Card>
         );
