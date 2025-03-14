@@ -178,7 +178,17 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_all_profiles: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          created_at: string
+          email: string
+          id: string
+          is_admin: boolean | null
+          is_premium: boolean | null
+          updated_at: string
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never
