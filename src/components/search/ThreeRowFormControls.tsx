@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { MatchLogicType } from '@/hooks/useThreeRowSearch';
 import { NumberInputRow } from '@/components/search/NumberInputRow';
 import { GameSelectors } from '@/components/search/GameSelectors';
-import { MatchLogicSelector } from '@/components/search/MatchLogicSelector';
+import { ThreeRowMatchLogicSelectors } from '@/components/search/ThreeRowMatchLogicSelectors';
 import { LottoGame, LottoType } from '@/types/supabase';
 
 interface ThreeRowFormControlsProps {
