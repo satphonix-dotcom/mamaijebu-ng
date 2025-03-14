@@ -15,18 +15,25 @@ import { Menu, ChartBar, Search, GitCompare } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { SearchTabContent } from './SearchTabContent';
 
-export const tabOptions = [
+// Split tabs into two rows
+export const searchTabsRow1 = [
   { id: "single", label: "Single Numbers" },
   { id: "pattern", label: "Number Pattern" },
   { id: "onerow", label: "One Row Numbers" },
   { id: "tworow", label: "Two Row Numbers" },
   { id: "threerow", label: "Three Row Numbers" },
+];
+
+export const searchTabsRow2 = [
   { id: "lapping", label: "Lapping Numbers" },
   { id: "knocking", label: "Knocking Numbers" },
   { id: "chart", label: "View Chart", icon: ChartBar },
   { id: "eventlookup", label: "Event Look-up", icon: Search },
   { id: "compare", label: "Compare Charts", icon: GitCompare }
 ];
+
+// Combined for backwards compatibility
+export const tabOptions = [...searchTabsRow1, ...searchTabsRow2];
 
 interface SearchTabsProps {
   isMobile: boolean;
@@ -90,18 +97,35 @@ export function SearchTabs({ isMobile, activeTab, setActiveTab }: SearchTabsProp
   
   return (
     <Tabs defaultValue="single" value={activeTab} onValueChange={setActiveTab}>
-      <TabsList className="mb-6 w-full grid grid-cols-4 md:grid-cols-8 gap-2">
-        {tabOptions.map((tab) => (
-          <TabsTrigger 
-            key={tab.id} 
-            value={tab.id} 
-            className="px-2 py-2 text-sm md:text-base md:px-4 flex items-center justify-center"
-          >
-            {tab.icon && <tab.icon className="mr-2 h-4 w-4" />}
-            {tab.label}
-          </TabsTrigger>
-        ))}
-      </TabsList>
+      <div className="space-y-2 mb-6">
+        {/* First row of tabs */}
+        <TabsList className="w-full grid grid-cols-5 gap-2">
+          {searchTabsRow1.map((tab) => (
+            <TabsTrigger 
+              key={tab.id} 
+              value={tab.id} 
+              className="px-2 py-2 text-sm md:text-base md:px-4 flex items-center justify-center"
+            >
+              {tab.icon && <tab.icon className="mr-2 h-4 w-4" />}
+              {tab.label}
+            </TabsTrigger>
+          ))}
+        </TabsList>
+        
+        {/* Second row of tabs */}
+        <TabsList className="w-full grid grid-cols-5 gap-2">
+          {searchTabsRow2.map((tab) => (
+            <TabsTrigger 
+              key={tab.id} 
+              value={tab.id} 
+              className="px-2 py-2 text-sm md:text-base md:px-4 flex items-center justify-center"
+            >
+              {tab.icon && <tab.icon className="mr-2 h-4 w-4" />}
+              {tab.label}
+            </TabsTrigger>
+          ))}
+        </TabsList>
+      </div>
       
       {tabOptions.map((tab) => (
         <TabsContent key={tab.id} value={tab.id}>
