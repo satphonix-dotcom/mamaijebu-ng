@@ -1,10 +1,11 @@
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Layout } from '@/components/Layout';
 import { SingleNumberSearch } from '@/components/search/SingleNumberSearch';
+import { PatternNumberSearch } from '@/components/search/PatternNumberSearch';
+import { OneRowNumbersSearch } from '@/components/search/OneRowNumbersSearch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { useSearchResults } from '@/hooks/useSearchResults';
 
 export default function Search() {
   return (
@@ -13,10 +14,10 @@ export default function Search() {
         <h1 className="text-3xl font-bold mb-6">Lottery Search Tools</h1>
         
         <Tabs defaultValue="single">
-          <TabsList className="mb-6 w-full max-w-md grid grid-cols-1 md:grid-cols-3">
+          <TabsList className="mb-6 w-full max-w-md grid grid-cols-3">
             <TabsTrigger value="single">Single Numbers</TabsTrigger>
-            <TabsTrigger value="pattern" disabled>Number Pattern</TabsTrigger>
-            <TabsTrigger value="onerow" disabled>One Row Numbers</TabsTrigger>
+            <TabsTrigger value="pattern">Number Pattern</TabsTrigger>
+            <TabsTrigger value="onerow">One Row Numbers</TabsTrigger>
           </TabsList>
           
           <TabsContent value="single">
@@ -38,12 +39,11 @@ export default function Search() {
               <CardHeader>
                 <CardTitle>Number Pattern Search</CardTitle>
                 <CardDescription>
-                  Study number movement patterns across lottery charts
+                  Study number movement patterns across lottery charts. Look for patterns in success and machine numbers.
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                {/* To be implemented */}
-                <p>This feature will be coming soon!</p>
+                <PatternNumberSearch />
               </CardContent>
             </Card>
           </TabsContent>
@@ -53,12 +53,11 @@ export default function Search() {
               <CardHeader>
                 <CardTitle>One Row Numbers Search</CardTitle>
                 <CardDescription>
-                  Look up numbers that occur within a single draw/event
+                  Look up numbers that occur within a single draw/event. Apply different match logics to refine your search.
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                {/* To be implemented */}
-                <p>This feature will be coming soon!</p>
+                <OneRowNumbersSearch />
               </CardContent>
             </Card>
           </TabsContent>
