@@ -1,11 +1,14 @@
+
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Layout } from "@/components/Layout";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { ProfileEditForm } from "@/components/profile/ProfileEditForm";
+import { Button } from "@/components/ui/button";
+import { Crown } from "lucide-react";
 
 // Sample data for the dashboard
 const recentDraws = [
@@ -30,7 +33,7 @@ const activityData = [
 ];
 
 const Dashboard = () => {
-  const { user, isLoading } = useAuth();
+  const { user, isLoading, isPremium } = useAuth();
   const navigate = useNavigate();
   
   // Redirect if not logged in
@@ -52,6 +55,60 @@ const Dashboard = () => {
     <Layout>
       <div className="container mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold mb-6">Welcome to Your Dashboard</h1>
+        
+        {/* Premium Status Card */}
+        {!isPremium && (
+          <Card className="mb-8 border-2 border-amber-200 bg-amber-50">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="flex items-center gap-2">
+                    <Crown className="h-5 w-5 text-amber-500" />
+                    Upgrade to Premium
+                  </CardTitle>
+                  <CardDescription>
+                    Unlock all premium features with a one-time payment
+                  </CardDescription>
+                </div>
+                <Button onClick={() => navigate("/premium")} className="bg-amber-500 hover:bg-amber-600">
+                  <Crown className="mr-2 h-4 w-4" />
+                  Upgrade Now
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm">
+                Get access to advanced pattern search, number analysis tools, and more with a premium account.
+              </p>
+            </CardContent>
+          </Card>
+        )}
+        
+        {isPremium && (
+          <Card className="mb-8 border-2 border-green-200 bg-green-50">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="flex items-center gap-2">
+                    <Crown className="h-5 w-5 text-green-500" />
+                    Premium Member
+                  </CardTitle>
+                  <CardDescription>
+                    You have access to all premium features
+                  </CardDescription>
+                </div>
+                <Button onClick={() => navigate("/search")} variant="outline" className="border-green-500 text-green-700 hover:bg-green-100">
+                  Try Premium Features
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm">
+                Enjoy exclusive features like advanced pattern search, number analysis tools, and more.
+              </p>
+            </CardContent>
+          </Card>
+        )}
         
         {/* Profile Edit Section */}
         <div className="mb-8">

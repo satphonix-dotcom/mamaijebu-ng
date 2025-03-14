@@ -14,9 +14,8 @@ export function PremiumRequired() {
     if (!user) {
       navigate('/login');
     } else {
-      // Otherwise, navigate to a hypothetical subscription page
-      // You would implement this page later
-      navigate('/dashboard');
+      // Otherwise, navigate to premium subscription page
+      navigate('/premium');
     }
   };
 
