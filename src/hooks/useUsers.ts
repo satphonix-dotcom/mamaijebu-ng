@@ -13,14 +13,19 @@ export function useUsers() {
     setIsLoading(true);
     try {
       console.log('Fetching users from Supabase');
+      // Remove any filters that might be limiting the results
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching users:', error);
+        throw error;
+      }
       
       console.log('Fetched users:', data?.length || 0);
+      console.log('User data:', data); // Log the actual user data for debugging
       setUsers(data || []);
     } catch (error) {
       console.error('Error fetching users:', error);

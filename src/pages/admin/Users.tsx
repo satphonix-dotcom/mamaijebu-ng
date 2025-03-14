@@ -18,6 +18,7 @@ export default function Users() {
 
   // Fetch users on initial mount
   useEffect(() => {
+    console.log('Users component mounted, fetching users');
     fetchUsers();
   }, []);
 
@@ -38,6 +39,7 @@ export default function Users() {
   };
 
   const handleRefresh = async () => {
+    console.log('Refreshing user list');
     await fetchUsers();
     toast({
       title: 'User list refreshed',
@@ -61,11 +63,14 @@ export default function Users() {
         {isLoading ? (
           <div className="flex items-center justify-center h-32">Loading users...</div>
         ) : (
-          <UsersTable 
-            users={users}
-            onEdit={setUserToEdit}
-            onDelete={setUserToDelete}
-          />
+          <>
+            <p className="mb-4">Total users: {users.length}</p>
+            <UsersTable 
+              users={users}
+              onEdit={setUserToEdit}
+              onDelete={setUserToDelete}
+            />
+          </>
         )}
 
         <DeleteUserDialog 
