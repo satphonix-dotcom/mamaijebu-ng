@@ -11,7 +11,7 @@ import {
   DrawerFooter,
 } from "@/components/ui/drawer";
 import { Button } from '@/components/ui/button';
-import { Menu, ChartBar } from 'lucide-react';
+import { Menu, ChartBar, Search } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { SearchTabContent } from './SearchTabContent';
 
@@ -23,7 +23,8 @@ export const tabOptions = [
   { id: "threerow", label: "Three Row Numbers" },
   { id: "lapping", label: "Lapping Numbers" },
   { id: "knocking", label: "Knocking Numbers" },
-  { id: "chart", label: "View Chart", icon: ChartBar }
+  { id: "chart", label: "View Chart", icon: ChartBar },
+  { id: "eventlookup", label: "Event Look-up", icon: Search }
 ];
 
 interface SearchTabsProps {

@@ -8,7 +8,8 @@ import {
   ThreeRowNumbersTabContent,
   LappingNumbersTabContent,
   KnockingNumbersTabContent,
-  ViewChartTabContent
+  ViewChartTabContent,
+  EventLookupTabContent
 } from './tab-content';
 
 interface SearchTabContentProps {
@@ -33,6 +34,8 @@ export function SearchTabContent({ activeTab }: SearchTabContentProps) {
       return <KnockingNumbersTabContent />;
     case "chart":
       return <ViewChartTabContent />;
+    case "eventlookup":
+      return <EventLookupTabContent />;
     default:
       return null;
   }

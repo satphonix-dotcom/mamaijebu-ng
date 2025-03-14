@@ -7,3 +7,4 @@ export * from './ThreeRowNumbersTabContent';
 export * from './LappingNumbersTabContent';
 export * from './KnockingNumbersTabContent';
 export * from './ViewChartTabContent';
+export * from './EventLookupTabContent';
