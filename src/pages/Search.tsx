@@ -4,6 +4,7 @@ import { Layout } from '@/components/Layout';
 import { SingleNumberSearch } from '@/components/search/SingleNumberSearch';
 import { PatternNumberSearch } from '@/components/search/PatternNumberSearch';
 import { OneRowNumbersSearch } from '@/components/search/OneRowNumbersSearch';
+import { TwoRowNumbersSearch } from '@/components/search/TwoRowNumbersSearch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
@@ -14,10 +15,11 @@ export default function Search() {
         <h1 className="text-3xl font-bold mb-6">Lottery Search Tools</h1>
         
         <Tabs defaultValue="single">
-          <TabsList className="mb-6 w-full max-w-md grid grid-cols-3">
+          <TabsList className="mb-6 w-full max-w-md grid grid-cols-4">
             <TabsTrigger value="single">Single Numbers</TabsTrigger>
             <TabsTrigger value="pattern">Number Pattern</TabsTrigger>
             <TabsTrigger value="onerow">One Row Numbers</TabsTrigger>
+            <TabsTrigger value="tworow">Two Row Numbers</TabsTrigger>
           </TabsList>
           
           <TabsContent value="single">
@@ -58,6 +60,20 @@ export default function Search() {
               </CardHeader>
               <CardContent>
                 <OneRowNumbersSearch />
+              </CardContent>
+            </Card>
+          </TabsContent>
+          
+          <TabsContent value="tworow">
+            <Card>
+              <CardHeader>
+                <CardTitle>Two Row Numbers Search</CardTitle>
+                <CardDescription>
+                  Search across two consecutive draws independently. Look for patterns across consecutive lottery events.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <TwoRowNumbersSearch />
               </CardContent>
             </Card>
           </TabsContent>
