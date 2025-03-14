@@ -73,6 +73,32 @@ export default function Games() {
     fetchData(); // Refresh data to ensure consistency
   };
 
+  const handleDeleteGame = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('lotto_games')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+
+      // Update local state
+      setGames(games.filter(game => game.id !== id));
+
+      toast({
+        title: 'Success',
+        description: 'Game deleted successfully',
+      });
+    } catch (error) {
+      console.error('Error deleting game:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to delete game. Please try again.',
+        variant: 'destructive',
+      });
+    }
+  };
+
   return (
     <AdminLayout>
       <div className="container mx-auto py-10">
@@ -87,7 +113,11 @@ export default function Games() {
           />
         </div>
 
-        <GamesGrid games={games} loading={loading} />
+        <GamesGrid 
+          games={games} 
+          loading={loading} 
+          onDeleteGame={handleDeleteGame}
+        />
       </div>
     </AdminLayout>
   );

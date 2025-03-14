@@ -60,6 +60,32 @@ export default function Draws() {
     }
   };
 
+  const handleDeleteDraw = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('lotto_draws')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+
+      // Update local state
+      setDraws(draws.filter(draw => draw.id !== id));
+
+      toast({
+        title: 'Success',
+        description: 'Draw deleted successfully',
+      });
+    } catch (error) {
+      console.error('Error deleting draw:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to delete draw. Please try again.',
+        variant: 'destructive',
+      });
+    }
+  };
+
   return (
     <AdminLayout>
       <div className="container mx-auto py-10">
@@ -72,7 +98,7 @@ export default function Draws() {
         <DrawsUploader games={games} onSuccess={fetchData} />
 
         {/* Draws List */}
-        <DrawsList draws={draws} loading={loading} />
+        <DrawsList draws={draws} loading={loading} onDeleteDraw={handleDeleteDraw} />
       </div>
     </AdminLayout>
   );

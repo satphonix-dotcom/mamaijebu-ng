@@ -91,6 +91,33 @@ export function useLottoTypes() {
     }
   };
 
+  const deleteLottoType = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('lotto_types')
+        .delete()
+        .eq('id', id);
+      
+      if (error) throw error;
+      
+      // Update the local state by removing the deleted type
+      setLottoTypes(lottoTypes.filter(type => type.id !== id));
+      
+      toast({
+        title: 'Success',
+        description: 'Lottery type deleted successfully',
+      });
+    } catch (error) {
+      console.error('Error deleting lottery type:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to delete lottery type. Please try again.',
+        variant: 'destructive',
+      });
+      throw error;
+    }
+  };
+
   useEffect(() => {
     fetchLottoTypes();
   }, []);
@@ -100,6 +127,7 @@ export function useLottoTypes() {
     loading,
     fetchLottoTypes,
     addLottoType,
-    updateLottoType
+    updateLottoType,
+    deleteLottoType
   };
 }

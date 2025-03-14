@@ -6,7 +6,7 @@ import { LottoTypesList } from '@/components/admin/lotto-types/LottoTypesList';
 import { AddLottoTypeDialog } from '@/components/admin/lotto-types/AddLottoTypeDialog';
 
 export default function LottoTypes() {
-  const { lottoTypes, loading, addLottoType, updateLottoType } = useLottoTypes();
+  const { lottoTypes, loading, addLottoType, updateLottoType, deleteLottoType } = useLottoTypes();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   return (
@@ -25,6 +25,7 @@ export default function LottoTypes() {
           lottoTypes={lottoTypes} 
           loading={loading} 
           onUpdateType={updateLottoType}
+          onDeleteType={deleteLottoType}
         />
       </div>
     </AdminLayout>

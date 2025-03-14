@@ -10,6 +10,17 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { AdminLayout } from '@/components/AdminLayout';
 import { supabase } from '@/integrations/supabase/client';
 import { Country } from '@/types/supabase';
+import { Trash2 } from 'lucide-react';
+import { 
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export default function Countries() {
   const [countries, setCountries] = useState<Country[]>([]);
@@ -17,6 +28,8 @@ export default function Countries() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [countryName, setCountryName] = useState('');
   const [countryCode, setCountryCode] = useState('');
+  const [countryToDelete, setCountryToDelete] = useState<string | null>(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   
   const { toast } = useToast();
 
@@ -76,6 +89,41 @@ export default function Countries() {
       toast({
         title: 'Error',
         description: 'Failed to add country. Please try again.',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const openDeleteDialog = (id: string) => {
+    setCountryToDelete(id);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const handleDelete = async () => {
+    if (!countryToDelete) return;
+
+    try {
+      const { error } = await supabase
+        .from('countries')
+        .delete()
+        .eq('id', countryToDelete);
+
+      if (error) throw error;
+
+      // Update local state
+      setCountries(countries.filter(country => country.id !== countryToDelete));
+      setCountryToDelete(null);
+      setIsDeleteDialogOpen(false);
+
+      toast({
+        title: 'Success',
+        description: 'Country deleted successfully',
+      });
+    } catch (error) {
+      console.error('Error deleting country:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to delete country. This country may be referenced by games.',
         variant: 'destructive',
       });
     }
@@ -149,6 +197,7 @@ export default function Countries() {
                   <TableRow>
                     <TableHead>Name</TableHead>
                     <TableHead>Code</TableHead>
+                    <TableHead className="w-[100px]">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -156,6 +205,15 @@ export default function Countries() {
                     <TableRow key={country.id}>
                       <TableCell className="font-medium">{country.name}</TableCell>
                       <TableCell>{country.code}</TableCell>
+                      <TableCell>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => openDeleteDialog(country.id)}
+                        >
+                          <Trash2 className="h-4 w-4 text-destructive" />
+                        </Button>
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -164,6 +222,24 @@ export default function Countries() {
           </Card>
         )}
       </div>
+
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the country.
+              If this country is used by any games, the deletion will fail.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setCountryToDelete(null)}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground">
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </AdminLayout>
   );
 }
