@@ -1,52 +1,20 @@
 
 import { useEffect, useState } from 'react';
 import { AdminLayout } from '@/components/AdminLayout';
-import { supabase } from '@/integrations/supabase/client';
 import { Profile } from '@/types/supabase';
 import { Button } from '@/components/ui/button';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
 import { PlusIcon } from 'lucide-react';
-import { useToast } from '@/components/ui/use-toast';
 import { DeleteUserDialog } from '@/components/admin/users/DeleteUserDialog';
 import { EditUserDialog } from '@/components/admin/users/EditUserDialog';
 import { CreateUserDialog } from '@/components/admin/users/CreateUserDialog';
+import { UsersTable } from '@/components/admin/users/UsersTable';
+import { useUsers } from '@/hooks/useUsers';
 
 export default function Users() {
-  const [users, setUsers] = useState<Profile[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const { users, isLoading, fetchUsers, deleteUser, updateUser, createUser } = useUsers();
   const [userToDelete, setUserToDelete] = useState<Profile | null>(null);
   const [userToEdit, setUserToEdit] = useState<Profile | null>(null);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
-  const { toast } = useToast();
-
-  const fetchUsers = async () => {
-    setIsLoading(true);
-    try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      setUsers(data || []);
-    } catch (error) {
-      console.error('Error fetching users:', error);
-      toast({
-        title: 'Failed to load users',
-        description: 'Please try again later.',
-        variant: 'destructive',
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   useEffect(() => {
     fetchUsers();
@@ -55,100 +23,22 @@ export default function Users() {
   const handleDeleteUser = async () => {
     if (!userToDelete) return;
     
-    try {
-      const { error } = await supabase
-        .from('profiles')
-        .delete()
-        .eq('id', userToDelete.id);
-
-      if (error) throw error;
-
-      setUsers(users.filter(user => user.id !== userToDelete.id));
-      toast({
-        title: 'User deleted',
-        description: 'User has been successfully deleted.',
-      });
-    } catch (error) {
-      console.error('Error deleting user:', error);
-      toast({
-        title: 'Failed to delete user',
-        description: 'There was an error deleting the user.',
-        variant: 'destructive',
-      });
-    } finally {
+    const success = await deleteUser(userToDelete.id);
+    if (success) {
       setUserToDelete(null);
     }
   };
 
   const handleUpdateUser = async (updatedUser: Profile) => {
-    try {
-      const { error } = await supabase
-        .from('profiles')
-        .update({
-          email: updatedUser.email,
-          is_admin: updatedUser.is_admin,
-        })
-        .eq('id', updatedUser.id);
-
-      if (error) throw error;
-
-      setUsers(users.map(user => (user.id === updatedUser.id ? updatedUser : user)));
-      toast({
-        title: 'User updated',
-        description: 'User has been successfully updated.',
-      });
-    } catch (error) {
-      console.error('Error updating user:', error);
-      toast({
-        title: 'Failed to update user',
-        description: 'There was an error updating the user.',
-        variant: 'destructive',
-      });
-    } finally {
+    const success = await updateUser(updatedUser);
+    if (success) {
       setUserToEdit(null);
     }
   };
 
   const handleCreateUser = async (newUser: Omit<Profile, 'id' | 'created_at' | 'updated_at'> & { password: string }) => {
-    try {
-      const { email, password, is_admin } = newUser;
-      
-      // Call our edge function to create the user
-      const response = await fetch(`${supabase.supabaseUrl}/functions/v1/create-user`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${supabase.supabaseKey}`
-        },
-        body: JSON.stringify({
-          email,
-          password,
-          is_admin
-        })
-      });
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to create user');
-      }
-      
-      const { user } = await response.json();
-      
-      if (user) {
-        setUsers([user, ...users]);
-        toast({
-          title: 'User created',
-          description: 'New user has been successfully created with authentication.',
-        });
-      }
-    } catch (error: any) {
-      console.error('Error creating user:', error);
-      toast({
-        title: 'Failed to create user',
-        description: error.message || 'There was an error creating the user.',
-        variant: 'destructive',
-      });
-    } finally {
+    const success = await createUser(newUser);
+    if (success) {
       setIsCreateDialogOpen(false);
     }
   };
@@ -166,51 +56,11 @@ export default function Users() {
         {isLoading ? (
           <div className="flex items-center justify-center h-32">Loading users...</div>
         ) : (
-          <div className="border rounded-md">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Email</TableHead>
-                  <TableHead>Admin Status</TableHead>
-                  <TableHead>Created At</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {users.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={4} className="text-center py-6">
-                      No users found. Create one to get started.
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  users.map((user) => (
-                    <TableRow key={user.id}>
-                      <TableCell>{user.email}</TableCell>
-                      <TableCell>{user.is_admin ? 'Admin' : 'User'}</TableCell>
-                      <TableCell>{new Date(user.created_at).toLocaleString()}</TableCell>
-                      <TableCell className="text-right space-x-2">
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          onClick={() => setUserToEdit(user)}
-                        >
-                          Edit
-                        </Button>
-                        <Button 
-                          variant="destructive" 
-                          size="sm" 
-                          onClick={() => setUserToDelete(user)}
-                        >
-                          Delete
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </div>
+          <UsersTable 
+            users={users}
+            onEdit={setUserToEdit}
+            onDelete={setUserToDelete}
+          />
         )}
 
         <DeleteUserDialog 
