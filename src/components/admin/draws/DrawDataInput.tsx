@@ -19,13 +19,13 @@ export const DrawDataInput = ({ value, onChange }: DrawDataInputProps) => {
             DrawNumber: DD/MM/YYYY: Main Numbers | Extra Numbers
           </code>
           <span className="text-xs block mt-1">
-            Example for EuroMillions: <code>3245: 04/01/2025: 10 20 30 40 50 | 01 02</code><br />
-            Example for 5/90 format: <code>3245: 04/01/2025: 10 20 30 40 50</code>
+            Example: <code>0001: 29/09/1962: 41 89 80 62 45 | 00 00 00 00 00</code><br />
+            Note: The system will ignore zeros in the extra numbers section.
           </span>
         </AlertDescription>
       </Alert>
       <Textarea
-        placeholder="e.g. 3245: 04/01/2025: 10 20 30 40 50 | 01 02"
+        placeholder="e.g. 0001: 29/09/1962: 41 89 80 62 45 | 00 00 00 00 00"
         value={value}
         onChange={(e) => onChange(e.target.value)}
         className="min-h-[200px] font-mono"

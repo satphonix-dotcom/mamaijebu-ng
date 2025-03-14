@@ -88,8 +88,12 @@ export const DrawsUploader = ({ games, onSuccess }: DrawsUploaderProps) => {
         throw new Error('Selected game not found');
       }
 
+      console.log(`Uploading ${draws.length} draws for game: ${game.name}`);
+      console.log(`Game configuration: ${game.ball_count} balls, range ${game.min_number}-${game.max_number}`);
+      
       let successCount = 0;
       let errorCount = 0;
+      let validationErrors: string[] = [];
 
       // Insert each draw one by one to better handle errors
       for (const draw of draws) {
@@ -98,6 +102,7 @@ export const DrawsUploader = ({ games, onSuccess }: DrawsUploaderProps) => {
         
         if (!validation.valid) {
           console.warn(validation.errors.join('\n'));
+          validationErrors = [...validationErrors, ...validation.errors];
           errorCount++;
           continue;
         }
@@ -108,8 +113,8 @@ export const DrawsUploader = ({ games, onSuccess }: DrawsUploaderProps) => {
           .insert({
             game_id: selectedGame,
             draw_date: draw.drawDate,
-            numbers: draw.numbers,
-            draw_number: draw.drawNumber  // Store the draw number
+            draw_number: draw.drawNumber,
+            numbers: draw.numbers
           });
 
         if (error) {
@@ -134,9 +139,18 @@ export const DrawsUploader = ({ games, onSuccess }: DrawsUploaderProps) => {
       } else {
         toast({
           title: 'Upload Failed',
-          description: 'No draws were uploaded. Please check the console for details.',
+          description: `No draws were uploaded. ${validationErrors.length > 0 ? 'Validation errors occurred.' : 'Please check the console for details.'}`,
           variant: 'destructive',
         });
+        
+        if (validationErrors.length > 0) {
+          console.error('Validation errors:', validationErrors);
+          toast({
+            title: 'Validation Errors',
+            description: validationErrors[0],
+            variant: 'destructive',
+          });
+        }
       }
     } catch (error) {
       console.error('Error processing draws:', error);

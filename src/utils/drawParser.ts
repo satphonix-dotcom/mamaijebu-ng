@@ -19,8 +19,7 @@ export const parseDraws = (text: string): Draw[] => {
   const lines = text.trim().split('\n');
   
   for (const line of lines) {
-    // Extract data using regex or split
-    // Format: 3245: 04/01/2025: 75 30 55 64 23 | 52 47 82 73 80
+    // Format: 0001: 29/09/1962: 41 89 80 62 45 | 00 00 00 00 00
     const parts = line.split(':').map(part => part.trim());
     
     if (parts.length < 3) continue;
@@ -36,7 +35,7 @@ export const parseDraws = (text: string): Draw[] => {
       set.trim().split(' ')
         .filter(n => n.trim() !== '')
         .map(n => parseInt(n.trim(), 10))
-        .filter(n => !isNaN(n))
+        .filter(n => !isNaN(n) && n !== 0) // Filter out zeros and NaN values
     );
     
     // All numbers combined (for backward compatibility)
@@ -52,7 +51,7 @@ export const parseDraws = (text: string): Draw[] => {
       // If we have multiple sets, store them separately
       if (numberSets.length > 1) {
         draw.mainNumbers = numberSets[0];
-        draw.extraNumbers = numberSets[1];
+        draw.extraNumbers = numberSets[1].filter(n => n !== 0); // Remove zeros
       }
       
       draws.push(draw);
@@ -79,54 +78,21 @@ export const formatDate = (dateStr: string): string => {
 export const validateDraw = (draw: Draw, game: LottoGame & { lotto_type?: LottoType }): { valid: boolean; errors: string[] } => {
   const errors: string[] = [];
   
-  // Get the lottery type configuration if available
-  const lottoTypeConfig = game.lotto_type?.configuration;
+  // We'll validate only the main numbers for now, ignoring zeros in extra numbers
+  const effectiveNumbers = draw.mainNumbers || draw.numbers;
   
-  if (lottoTypeConfig && lottoTypeConfig.has_multiple_sets) {
-    // For games with multiple number sets like EuroMillions
-    const mainNumbers = draw.mainNumbers || [];
-    const extraNumbers = draw.extraNumbers || [];
-    
-    // Validate main numbers
-    if (mainNumbers.length !== lottoTypeConfig.main_numbers.count) {
-      errors.push(`Draw ${draw.drawNumber} has ${mainNumbers.length} main numbers but requires ${lottoTypeConfig.main_numbers.count}`);
-    }
-    
-    const invalidMainNumbers = mainNumbers.filter(
-      n => n < lottoTypeConfig.main_numbers.min || n > lottoTypeConfig.main_numbers.max
-    );
-    
-    if (invalidMainNumbers.length > 0) {
-      errors.push(`Draw ${draw.drawNumber} has main numbers outside the range: ${invalidMainNumbers.join(', ')}`);
-    }
-    
-    // Validate extra numbers
-    if (extraNumbers.length !== lottoTypeConfig.extra_numbers.count) {
-      errors.push(`Draw ${draw.drawNumber} has ${extraNumbers.length} extra numbers but requires ${lottoTypeConfig.extra_numbers.count}`);
-    }
-    
-    const invalidExtraNumbers = extraNumbers.filter(
-      n => n < lottoTypeConfig.extra_numbers.min || n > lottoTypeConfig.extra_numbers.max
-    );
-    
-    if (invalidExtraNumbers.length > 0) {
-      errors.push(`Draw ${draw.drawNumber} has extra numbers outside the range: ${invalidExtraNumbers.join(', ')}`);
-    }
-  } else {
-    // Fallback to old validation for games without detailed configuration
-    // Validate number count
-    if (draw.numbers.length !== game.ball_count) {
-      errors.push(`Draw ${draw.drawNumber} has ${draw.numbers.length} balls but game requires ${game.ball_count}`);
-    }
+  // Validate number count against game configuration
+  if (effectiveNumbers.length !== game.ball_count) {
+    errors.push(`Draw ${draw.drawNumber} has ${effectiveNumbers.length} balls but game requires ${game.ball_count}`);
+  }
 
-    // Validate number range
-    const invalidNumbers = draw.numbers.filter(
-      n => n < game.min_number || n > game.max_number
-    );
-    
-    if (invalidNumbers.length > 0) {
-      errors.push(`Draw ${draw.drawNumber} has numbers outside the allowed range: ${invalidNumbers.join(', ')}`);
-    }
+  // Validate number range against game configuration
+  const invalidNumbers = effectiveNumbers.filter(
+    n => n < game.min_number || n > game.max_number
+  );
+  
+  if (invalidNumbers.length > 0) {
+    errors.push(`Draw ${draw.drawNumber} has numbers outside the allowed range: ${invalidNumbers.join(', ')}`);
   }
 
   return {
