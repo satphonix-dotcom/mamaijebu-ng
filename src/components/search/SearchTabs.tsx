@@ -11,12 +11,19 @@ import {
   DrawerFooter,
 } from "@/components/ui/drawer";
 import { Button } from '@/components/ui/button';
-import { Menu, ChartBar, Search, GitCompare } from 'lucide-react';
+import { Menu, ChartBar, Search, GitCompare, LucideIcon } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { SearchTabContent } from './SearchTabContent';
 
+// Define interface for tab items
+interface TabItem {
+  id: string;
+  label: string;
+  icon?: LucideIcon;
+}
+
 // Split tabs into two rows
-export const searchTabsRow1 = [
+export const searchTabsRow1: TabItem[] = [
   { id: "single", label: "Single Numbers" },
   { id: "pattern", label: "Number Pattern" },
   { id: "onerow", label: "One Row Numbers" },
@@ -24,7 +31,7 @@ export const searchTabsRow1 = [
   { id: "threerow", label: "Three Row Numbers" },
 ];
 
-export const searchTabsRow2 = [
+export const searchTabsRow2: TabItem[] = [
   { id: "lapping", label: "Lapping Numbers" },
   { id: "knocking", label: "Knocking Numbers" },
   { id: "chart", label: "View Chart", icon: ChartBar },
@@ -33,7 +40,7 @@ export const searchTabsRow2 = [
 ];
 
 // Combined for backwards compatibility
-export const tabOptions = [...searchTabsRow1, ...searchTabsRow2];
+export const tabOptions: TabItem[] = [...searchTabsRow1, ...searchTabsRow2];
 
 interface SearchTabsProps {
   isMobile: boolean;
