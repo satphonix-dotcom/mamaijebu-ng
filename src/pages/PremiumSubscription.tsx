@@ -1,4 +1,5 @@
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import { Layout } from "@/components/Layout";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,6 +8,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
+import { SubscriptionPlan } from "@/types/supabase";
 
 const PremiumSubscription = () => {
   const { user, profile, isPremium, upgradeToPremeium } = useAuth();
@@ -15,6 +17,43 @@ const PremiumSubscription = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [paymentInitiated, setPaymentInitiated] = useState(false);
   const [paymentReference, setPaymentReference] = useState<string | null>(null);
+  const [premiumPlan, setPremiumPlan] = useState<SubscriptionPlan | null>(null);
+  const [isLoadingPlan, setIsLoadingPlan] = useState(true);
+
+  useEffect(() => {
+    fetchPremiumPlan();
+  }, []);
+
+  const fetchPremiumPlan = async () => {
+    setIsLoadingPlan(true);
+    try {
+      // Fetch the premium plan (assuming it's the yearly plan)
+      const { data, error } = await supabase
+        .from('subscription_plans')
+        .select('*')
+        .eq('period', 'yearly')
+        .eq('is_active', true)
+        .single();
+
+      if (error) throw error;
+      
+      setPremiumPlan(data as SubscriptionPlan);
+    } catch (error) {
+      console.error('Error fetching premium plan:', error);
+      // If we can't fetch a plan, use a default price
+      setPremiumPlan({
+        id: 'default',
+        name: 'Premium',
+        period: 'yearly',
+        price: 799999, // Default price in kobo
+        is_active: true,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      });
+    } finally {
+      setIsLoadingPlan(false);
+    }
+  };
 
   // Redirect to login if not logged in
   if (!user) {
@@ -67,7 +106,25 @@ const PremiumSubscription = () => {
     );
   }
 
+  const getPriceDisplay = () => {
+    if (isLoadingPlan) return "Loading...";
+    if (!premiumPlan) return "₦7,999.99";
+    
+    // Format the price from kobo (stored in the DB) to naira with proper formatting
+    const priceInNaira = premiumPlan.price / 100;
+    return `₦${priceInNaira.toLocaleString('en-NG', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  };
+
   const handlePaymentInitiate = async () => {
+    if (!premiumPlan) {
+      toast({
+        title: "Error",
+        description: "Could not load subscription plan details. Please try again.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsLoading(true);
     try {
       // Use edge function to initiate payment
@@ -75,7 +132,7 @@ const PremiumSubscription = () => {
         body: {
           userId: user.id,
           userEmail: profile?.email || user.email,
-          amount: 7999.99, // ₦7,999.99 in NGN
+          amount: premiumPlan.price / 100, // Convert kobo to naira for the API
           callbackUrl: window.location.origin + '/premium-confirmation'
         }
       });
@@ -185,7 +242,7 @@ const PremiumSubscription = () => {
                   </li>
                 </ul>
                 <div className="mt-6 text-center">
-                  <p className="text-xl font-bold mb-2">₦7,999.99</p>
+                  <p className="text-xl font-bold mb-2">{getPriceDisplay()}</p>
                   <p className="text-green-600">Lifetime Access</p>
                 </div>
               </div>
@@ -203,15 +260,20 @@ const PremiumSubscription = () => {
               size="lg" 
               className="w-full max-w-md mb-4"
               onClick={handlePaymentInitiate}
-              disabled={isLoading}
+              disabled={isLoading || isLoadingPlan}
             >
               {isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Processing...
                 </>
+              ) : isLoadingPlan ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Loading plan...
+                </>
               ) : (
-                "Upgrade to Premium (₦7,999.99)"
+                `Upgrade to Premium (${getPriceDisplay()})`
               )}
             </Button>
             <p className="text-xs text-gray-500">
