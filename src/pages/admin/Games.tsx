@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { AdminLayout } from '@/components/AdminLayout';
 import { supabase } from '@/integrations/supabase/client';
 import { LottoGame, Country, LottoType } from '@/types/supabase';
-import { GameFormDialog } from '@/components/admin/GameFormDialog';
+import { GameFormDialog } from '@/components/admin/games/GameFormDialog';
 import { GamesGrid } from '@/components/admin/GamesGrid';
 
 export default function Games() {
