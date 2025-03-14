@@ -9,12 +9,14 @@ import { EditUserDialog } from '@/components/admin/users/EditUserDialog';
 import { UsersTable } from '@/components/admin/users/UsersTable';
 import { useUsers } from '@/hooks/useUsers';
 import { useToast } from '@/components/ui/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function Users() {
   const { users, isLoading, fetchUsers, deleteUser, updateUser } = useUsers();
   const [userToDelete, setUserToDelete] = useState<Profile | null>(null);
   const [userToEdit, setUserToEdit] = useState<Profile | null>(null);
   const { toast } = useToast();
+  const { user } = useAuth();
 
   // Fetch users on initial mount
   useEffect(() => {
@@ -64,7 +66,10 @@ export default function Users() {
           <div className="flex items-center justify-center h-32">Loading users...</div>
         ) : (
           <>
-            <p className="mb-4">Total users: {users.length}</p>
+            <div className="mb-4">
+              <p>Total users: <span className="font-bold">{users.length}</span></p>
+              <p className="text-sm text-muted-foreground">Currently logged in as: {user?.email}</p>
+            </div>
             <UsersTable 
               users={users}
               onEdit={setUserToEdit}

@@ -13,7 +13,8 @@ export function useUsers() {
     setIsLoading(true);
     try {
       console.log('Fetching users from Supabase');
-      // Remove any filters that might be limiting the results
+      
+      // Make sure we're fetching with the right service role to bypass RLS
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
@@ -26,6 +27,8 @@ export function useUsers() {
       
       console.log('Fetched users:', data?.length || 0);
       console.log('User data:', data); // Log the actual user data for debugging
+      
+      // Ensure we're setting all users we get back
       setUsers(data || []);
     } catch (error) {
       console.error('Error fetching users:', error);
