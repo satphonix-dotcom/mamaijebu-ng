@@ -16,7 +16,7 @@ export const PaymentSection = ({ isLoading, isLoadingPlan, priceDisplay, onPayme
       <div className="bg-gray-50 p-4 rounded-lg border mt-8">
         <h3 className="font-bold mb-2">Payment Information</h3>
         <p className="text-gray-600 mb-4">
-          Secure payment is processed via Paystack. You'll receive immediate access to premium features after payment.
+          Secure payment is processed via Paystack. Pay once and get permanent access to all premium features - no subscriptions or recurring charges.
         </p>
       </div>
       <CardFooter className="flex flex-col items-center">
@@ -37,7 +37,7 @@ export const PaymentSection = ({ isLoading, isLoadingPlan, priceDisplay, onPayme
               Loading plan...
             </>
           ) : (
-            `Upgrade to Premium (${priceDisplay})`
+            `Upgrade to Premium (${priceDisplay}) - One-time Payment`
           )}
         </Button>
         <p className="text-xs text-gray-500">
