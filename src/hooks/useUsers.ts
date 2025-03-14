@@ -15,8 +15,7 @@ export function useUsers() {
       
       // Use RPC function to fetch all profiles to bypass RLS
       const { data, error } = await supabase
-        .rpc('get_all_profiles')
-        .order('created_at', { ascending: false });
+        .rpc('get_all_profiles');
 
       if (error) {
         console.error('Error fetching users:', error);
