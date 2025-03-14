@@ -1,4 +1,3 @@
-
 import React from 'react';
 import {
   Select,
@@ -7,7 +6,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { KnockingMatchLogicType } from '@/hooks/useKnockingSearch';
+import { KnockingMatchLogicType } from '@/types/knockingSearch';
 
 interface KnockingMatchLogicSelectorProps {
   value: KnockingMatchLogicType;

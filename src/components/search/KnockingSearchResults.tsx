@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { KnockingSearchResult } from '@/hooks/useKnockingSearch';
+import { KnockingSearchResult } from '@/types/knockingSearch';
 import { format } from 'date-fns';
 
 interface KnockingSearchResultsProps {
