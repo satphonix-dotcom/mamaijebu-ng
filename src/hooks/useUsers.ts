@@ -141,7 +141,8 @@ export function useUsers() {
       console.log('User creation successful:', responseData);
       
       if (responseData.user) {
-        setUsers([responseData.user, ...users]);
+        // Instead of just adding to the local state, let's refetch all users to ensure consistency
+        await fetchUsers();
         toast({
           title: 'User created',
           description: 'New user has been successfully created with authentication.',

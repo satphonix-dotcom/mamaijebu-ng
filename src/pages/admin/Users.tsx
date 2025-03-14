@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { AdminLayout } from '@/components/AdminLayout';
 import { Profile } from '@/types/supabase';
 import { Button } from '@/components/ui/button';
-import { PlusIcon } from 'lucide-react';
+import { PlusIcon, RefreshCw } from 'lucide-react';
 import { DeleteUserDialog } from '@/components/admin/users/DeleteUserDialog';
 import { EditUserDialog } from '@/components/admin/users/EditUserDialog';
 import { CreateUserDialog } from '@/components/admin/users/CreateUserDialog';
@@ -43,14 +43,24 @@ export default function Users() {
     }
   };
 
+  const handleRefresh = () => {
+    fetchUsers();
+  };
+
   return (
     <AdminLayout>
       <div className="container mx-auto p-4">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold">User Management</h1>
-          <Button onClick={() => setIsCreateDialogOpen(true)}>
-            <PlusIcon className="mr-2 h-4 w-4" /> Add User
-          </Button>
+          <div className="flex space-x-2">
+            <Button variant="outline" onClick={handleRefresh} disabled={isLoading}>
+              <RefreshCw className="h-4 w-4 mr-2" />
+              Refresh
+            </Button>
+            <Button onClick={() => setIsCreateDialogOpen(true)}>
+              <PlusIcon className="mr-2 h-4 w-4" /> Add User
+            </Button>
+          </div>
         </div>
 
         {isLoading ? (
