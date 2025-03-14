@@ -109,37 +109,43 @@ export default function Users() {
     }
   };
 
-  const handleCreateUser = async (newUser: Omit<Profile, 'id' | 'created_at' | 'updated_at'>) => {
+  const handleCreateUser = async (newUser: Omit<Profile, 'id' | 'created_at' | 'updated_at'> & { password: string }) => {
     try {
-      // Generate a UUID for the new user - in a real app this should come from auth system
-      const id = crypto.randomUUID();
+      const { email, password, is_admin } = newUser;
       
-      const { data, error } = await supabase
-        .from('profiles')
-        .insert({
-          id, // Include the generated ID
-          email: newUser.email,
-          is_admin: newUser.is_admin,
+      // Call our edge function to create the user
+      const response = await fetch(`${supabase.supabaseUrl}/functions/v1/create-user`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${supabase.supabaseKey}`
+        },
+        body: JSON.stringify({
+          email,
+          password,
+          is_admin
         })
-        .select();
-
-      if (error) {
-        console.error('Error creating user:', error);
-        throw error;
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to create user');
       }
       
-      if (data && data.length > 0) {
-        setUsers([data[0], ...users]);
+      const { user } = await response.json();
+      
+      if (user) {
+        setUsers([user, ...users]);
         toast({
           title: 'User created',
-          description: 'New user has been successfully created.',
+          description: 'New user has been successfully created with authentication.',
         });
       }
     } catch (error: any) {
       console.error('Error creating user:', error);
       toast({
         title: 'Failed to create user',
-        description: 'There was an error creating the user. Note: In a real app, this would require creating an auth user first.',
+        description: error.message || 'There was an error creating the user.',
         variant: 'destructive',
       });
     } finally {
