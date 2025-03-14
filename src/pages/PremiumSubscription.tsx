@@ -1,59 +1,23 @@
 
-import { useState, useEffect } from "react";
 import { Layout } from "@/components/Layout";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Loader2, CheckCircle, XCircle, Crown } from "lucide-react";
-import { useToast } from "@/components/ui/use-toast";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Crown } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
-import { SubscriptionPlan } from "@/types/supabase";
+import { PremiumUserView } from "@/components/premium/PremiumUserView";
+import { PlanComparison } from "@/components/premium/PlanComparison";
+import { PaymentSection } from "@/components/premium/PaymentSection";
+import { usePremiumSubscription } from "@/hooks/usePremiumSubscription";
 
 const PremiumSubscription = () => {
-  const { user, profile, isPremium, upgradeToPremeium } = useAuth();
+  const { user, isPremium } = useAuth();
   const navigate = useNavigate();
-  const { toast } = useToast();
-  const [isLoading, setIsLoading] = useState(false);
-  const [paymentInitiated, setPaymentInitiated] = useState(false);
-  const [paymentReference, setPaymentReference] = useState<string | null>(null);
-  const [premiumPlan, setPremiumPlan] = useState<SubscriptionPlan | null>(null);
-  const [isLoadingPlan, setIsLoadingPlan] = useState(true);
-
-  useEffect(() => {
-    fetchPremiumPlan();
-  }, []);
-
-  const fetchPremiumPlan = async () => {
-    setIsLoadingPlan(true);
-    try {
-      // Fetch the premium plan (assuming it's the yearly plan)
-      const { data, error } = await supabase
-        .from('subscription_plans')
-        .select('*')
-        .eq('period', 'yearly')
-        .eq('is_active', true)
-        .single();
-
-      if (error) throw error;
-      
-      setPremiumPlan(data as SubscriptionPlan);
-    } catch (error) {
-      console.error('Error fetching premium plan:', error);
-      // If we can't fetch a plan, use a default price
-      setPremiumPlan({
-        id: 'default',
-        name: 'Premium',
-        period: 'yearly',
-        price: 799999, // Default price in kobo
-        is_active: true,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      });
-    } finally {
-      setIsLoadingPlan(false);
-    }
-  };
+  const { 
+    isLoading, 
+    isLoadingPlan, 
+    getPriceDisplay, 
+    handlePaymentInitiate 
+  } = usePremiumSubscription();
 
   // Redirect to login if not logged in
   if (!user) {
@@ -66,101 +30,11 @@ const PremiumSubscription = () => {
     return (
       <Layout>
         <div className="container max-w-4xl mx-auto py-8 px-4">
-          <Card className="w-full">
-            <CardHeader className="text-center">
-              <div className="flex justify-center mb-4">
-                <div className="h-16 w-16 rounded-full bg-green-100 flex items-center justify-center">
-                  <CheckCircle className="h-8 w-8 text-green-500" />
-                </div>
-              </div>
-              <CardTitle className="text-2xl">You're a Premium Member!</CardTitle>
-              <CardDescription>
-                You already have access to all premium features
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="text-center space-y-6">
-              <p>Enjoy all the exclusive features and benefits of your premium membership.</p>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="border rounded-lg p-4 flex flex-col items-center">
-                  <CheckCircle className="h-6 w-6 text-green-500 mb-2" />
-                  <h3 className="font-medium">Advanced Pattern Search</h3>
-                </div>
-                <div className="border rounded-lg p-4 flex flex-col items-center">
-                  <CheckCircle className="h-6 w-6 text-green-500 mb-2" />
-                  <h3 className="font-medium">Single & Multiple Number Analysis</h3>
-                </div>
-                <div className="border rounded-lg p-4 flex flex-col items-center">
-                  <CheckCircle className="h-6 w-6 text-green-500 mb-2" />
-                  <h3 className="font-medium">Compare Charts</h3>
-                </div>
-              </div>
-            </CardContent>
-            <CardFooter className="flex justify-center">
-              <Button variant="outline" onClick={() => navigate("/search")}>
-                Go to Search
-              </Button>
-            </CardFooter>
-          </Card>
+          <PremiumUserView />
         </div>
       </Layout>
     );
   }
-
-  const getPriceDisplay = () => {
-    if (isLoadingPlan) return "Loading...";
-    if (!premiumPlan) return "₦7,999.99";
-    
-    // Format the price from kobo (stored in the DB) to naira with proper formatting
-    const priceInNaira = premiumPlan.price / 100;
-    return `₦${priceInNaira.toLocaleString('en-NG', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-  };
-
-  const handlePaymentInitiate = async () => {
-    if (!premiumPlan) {
-      toast({
-        title: "Error",
-        description: "Could not load subscription plan details. Please try again.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setIsLoading(true);
-    try {
-      // Use edge function to initiate payment
-      const { data, error } = await supabase.functions.invoke('initiate-payment', {
-        body: {
-          userId: user.id,
-          userEmail: profile?.email || user.email,
-          amount: premiumPlan.price / 100, // Convert kobo to naira for the API
-          callbackUrl: window.location.origin + '/premium-confirmation'
-        }
-      });
-
-      if (error) {
-        throw new Error(error.message);
-      }
-
-      if (data.success) {
-        setPaymentReference(data.reference);
-        setPaymentInitiated(true);
-        
-        // Redirect to Paystack payment page
-        window.location.href = data.paymentUrl;
-      } else {
-        throw new Error(data.error || "Failed to initiate payment");
-      }
-    } catch (error) {
-      console.error("Payment initiation failed:", error);
-      toast({
-        title: "Payment Error",
-        description: error.message || "There was a problem initiating your payment. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   return (
     <Layout>
@@ -178,108 +52,14 @@ const PremiumSubscription = () => {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="border rounded-lg p-6">
-                <h3 className="font-bold mb-4 text-lg flex items-center gap-2">
-                  Standard (Free)
-                </h3>
-                <ul className="space-y-3">
-                  <li className="flex items-start gap-2">
-                    <CheckCircle className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />
-                    <span>Basic lottery results</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />
-                    <span>View charts</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <XCircle className="h-5 w-5 text-gray-300 shrink-0 mt-0.5" />
-                    <span className="text-gray-500">Advanced pattern search</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <XCircle className="h-5 w-5 text-gray-300 shrink-0 mt-0.5" />
-                    <span className="text-gray-500">One, Two & Three Row Numbers</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <XCircle className="h-5 w-5 text-gray-300 shrink-0 mt-0.5" />
-                    <span className="text-gray-500">Lapping & Knocking Numbers</span>
-                  </li>
-                </ul>
-                <div className="mt-6 text-center">
-                  <p className="text-xl font-bold mb-2">₦0</p>
-                  <p className="text-gray-500">Current Plan</p>
-                </div>
-              </div>
-              
-              <div className="border-2 border-primary rounded-lg p-6 bg-primary/5 relative">
-                <div className="absolute -top-3 -right-3 bg-primary text-primary-foreground text-xs py-1 px-3 rounded-full">
-                  Recommended
-                </div>
-                <h3 className="font-bold mb-4 text-lg flex items-center gap-2 text-primary">
-                  <Crown className="h-5 w-5" />
-                  Premium (One-time)
-                </h3>
-                <ul className="space-y-3">
-                  <li className="flex items-start gap-2">
-                    <CheckCircle className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />
-                    <span>Everything in Standard</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />
-                    <span>Advanced pattern search</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />
-                    <span>Single, One, Two & Three Row Numbers</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />
-                    <span>Lapping & Knocking Numbers</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />
-                    <span>Compare Charts</span>
-                  </li>
-                </ul>
-                <div className="mt-6 text-center">
-                  <p className="text-xl font-bold mb-2">{getPriceDisplay()}</p>
-                  <p className="text-green-600">Lifetime Access</p>
-                </div>
-              </div>
-            </div>
-            
-            <div className="bg-gray-50 p-4 rounded-lg border mt-8">
-              <h3 className="font-bold mb-2">Payment Information</h3>
-              <p className="text-gray-600 mb-4">
-                Secure payment is processed via Paystack. You'll receive immediate access to premium features after payment.
-              </p>
-            </div>
+            <PlanComparison premiumPrice={getPriceDisplay()} />
+            <PaymentSection 
+              isLoading={isLoading}
+              isLoadingPlan={isLoadingPlan}
+              priceDisplay={getPriceDisplay()}
+              onPaymentInitiate={handlePaymentInitiate}
+            />
           </CardContent>
-          <CardFooter className="flex flex-col items-center">
-            <Button 
-              size="lg" 
-              className="w-full max-w-md mb-4"
-              onClick={handlePaymentInitiate}
-              disabled={isLoading || isLoadingPlan}
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Processing...
-                </>
-              ) : isLoadingPlan ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Loading plan...
-                </>
-              ) : (
-                `Upgrade to Premium (${getPriceDisplay()})`
-              )}
-            </Button>
-            <p className="text-xs text-gray-500">
-              By upgrading, you agree to our Terms of Service and Privacy Policy
-            </p>
-          </CardFooter>
         </Card>
       </div>
     </Layout>
