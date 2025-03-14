@@ -11,6 +11,7 @@ interface SearchParams {
   gameTypeId: string | null;
   gameId: string | null;
   searchLogic: SearchLogicType;
+  position?: number;
 }
 
 interface SearchResult {
@@ -72,9 +73,9 @@ export function useSearchResults() {
           const machineNumbers = numbers.slice(5);
           return machineNumbers.includes(params.number);
         } else if (params.searchLogic === 'position') {
-          // For position search, we're just checking if the number exists in any position
-          // In a real implementation, you'd check specific positions
-          return numbers.includes(params.number);
+          // For position search, check if the number exists at the specified position
+          const positionIndex = params.position !== undefined ? params.position : 0;
+          return numbers[positionIndex] === params.number;
         }
         
         return false;
