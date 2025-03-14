@@ -53,14 +53,13 @@ interface SearchTabsProps {
 
 export function SearchTabs({ isMobile, activeTab, setActiveTab }: SearchTabsProps) {
   const [open, setOpen] = React.useState(false);
-  const { user, profile } = useAuth();
-  const isPremiumMember = profile?.is_premium || false;
+  const { user, isPremium } = useAuth();
 
   const handleTabChange = (value: string) => {
     const tab = tabOptions.find(tab => tab.id === value);
     
     // Only allow changing to premium tabs if user is premium
-    if (tab?.premium && !isPremiumMember) {
+    if (tab?.premium && !isPremium) {
       return;
     }
     
@@ -94,11 +93,11 @@ export function SearchTabs({ isMobile, activeTab, setActiveTab }: SearchTabsProp
                       variant={activeTab === tab.id ? "default" : "ghost"}
                       className="justify-start w-full"
                       onClick={() => handleTabChange(tab.id)}
-                      disabled={tab.premium && !isPremiumMember}
+                      disabled={tab.premium && !isPremium}
                     >
                       {tab.icon && <tab.icon className="mr-2 h-4 w-4" />}
                       {tab.label}
-                      {tab.premium && !isPremiumMember && <Lock className="ml-2 h-3 w-3" />}
+                      {tab.premium && !isPremium && <Lock className="ml-2 h-3 w-3" />}
                     </Button>
                   ))}
                 </div>
@@ -126,11 +125,11 @@ export function SearchTabs({ isMobile, activeTab, setActiveTab }: SearchTabsProp
               key={tab.id} 
               value={tab.id} 
               className="px-2 py-2 text-sm md:text-base md:px-4 flex items-center justify-center relative"
-              disabled={tab.premium && !isPremiumMember}
+              disabled={tab.premium && !isPremium}
             >
               {tab.icon && <tab.icon className="mr-2 h-4 w-4" />}
               {tab.label}
-              {tab.premium && !isPremiumMember && <Lock className="ml-1 h-3 w-3 absolute top-1 right-1" />}
+              {tab.premium && !isPremium && <Lock className="ml-1 h-3 w-3 absolute top-1 right-1" />}
             </TabsTrigger>
           ))}
         </TabsList>
@@ -142,11 +141,11 @@ export function SearchTabs({ isMobile, activeTab, setActiveTab }: SearchTabsProp
               key={tab.id} 
               value={tab.id} 
               className="px-2 py-2 text-sm md:text-base md:px-4 flex items-center justify-center relative"
-              disabled={tab.premium && !isPremiumMember}
+              disabled={tab.premium && !isPremium}
             >
               {tab.icon && <tab.icon className="mr-2 h-4 w-4" />}
               {tab.label}
-              {tab.premium && !isPremiumMember && <Lock className="ml-1 h-3 w-3 absolute top-1 right-1" />}
+              {tab.premium && !isPremium && <Lock className="ml-1 h-3 w-3 absolute top-1 right-1" />}
             </TabsTrigger>
           ))}
         </TabsList>
@@ -154,7 +153,7 @@ export function SearchTabs({ isMobile, activeTab, setActiveTab }: SearchTabsProp
       
       {tabOptions.map((tab) => (
         <TabsContent key={tab.id} value={tab.id}>
-          {(tab.premium && !isPremiumMember) ? (
+          {(tab.premium && !isPremium) ? (
             <PremiumRequired />
           ) : (
             <SearchTabContent activeTab={tab.id} />

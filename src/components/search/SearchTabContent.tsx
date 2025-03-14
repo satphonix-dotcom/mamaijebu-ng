@@ -23,11 +23,10 @@ interface SearchTabContentProps {
 const premiumTabs = ['single', 'pattern', 'onerow', 'tworow', 'threerow', 'lapping', 'knocking', 'compare'];
 
 export function SearchTabContent({ activeTab }: SearchTabContentProps) {
-  const { profile } = useAuth();
-  const isPremiumMember = profile?.is_premium || false;
+  const { isPremium } = useAuth();
   
   // Check if the active tab requires premium and user is not premium
-  const requiresPremium = premiumTabs.includes(activeTab) && !isPremiumMember;
+  const requiresPremium = premiumTabs.includes(activeTab) && !isPremium;
   
   if (requiresPremium) {
     return <PremiumRequired />;
