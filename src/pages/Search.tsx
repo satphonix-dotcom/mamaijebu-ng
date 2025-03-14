@@ -7,6 +7,7 @@ import { OneRowNumbersSearch } from '@/components/search/OneRowNumbersSearch';
 import { TwoRowNumbersSearch } from '@/components/search/TwoRowNumbersSearch';
 import { ThreeRowNumbersSearch } from '@/components/search/ThreeRowNumbersSearch';
 import { LappingNumbersSearch } from '@/components/search/LappingNumbersSearch';
+import { KnockingNumbersSearch } from '@/components/search/KnockingNumbersSearch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useIsMobile } from '@/hooks/use-mobile';

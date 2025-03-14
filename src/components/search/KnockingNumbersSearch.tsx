@@ -1,12 +1,13 @@
 
-import React, { useState, useEffect } from 'react';
-import { useLottoTypes } from '@/hooks/useLottoTypes';
-import { supabase } from '@/integrations/supabase/client';
-import { LottoGame } from '@/types/supabase';
+import React from 'react';
 import { KnockingSearchForm } from '@/components/search/KnockingSearchForm';
 import { KnockingSearchResults } from '@/components/search/KnockingSearchResults';
 import { useKnockingSearch } from '@/hooks/useKnockingSearch';
+import { useLottoTypes } from '@/hooks/useLottoTypes';
+import { supabase } from '@/integrations/supabase/client';
+import { LottoGame } from '@/types/supabase';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useState, useEffect } from 'react';
 
 export function KnockingNumbersSearch() {
   const [games, setGames] = useState<LottoGame[]>([]);
