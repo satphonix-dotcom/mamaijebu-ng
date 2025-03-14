@@ -2,7 +2,6 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { AdminLayout } from '@/components/AdminLayout';
-import { Country, LottoType } from '@/types/supabase';
 import { GameFormDialog } from '@/components/admin/games/GameFormDialog';
 import { GamesGrid } from '@/components/admin/GamesGrid';
 import { useGames } from '@/hooks/useGames';

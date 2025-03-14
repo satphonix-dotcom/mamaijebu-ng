@@ -40,6 +40,8 @@ export function useGames() {
 
   const handleDeleteGame = async (id: string) => {
     try {
+      console.log('Deleting game with ID:', id);
+      
       // First, check if there are any draws associated with this game
       const { data: draws, error: drawsError } = await supabase
         .from('lotto_draws')
@@ -66,7 +68,7 @@ export function useGames() {
 
       if (error) throw error;
 
-      // Update local state - make sure this is properly filtering the deleted game
+      // Update local state by filtering out the deleted game
       setGames(prevGames => prevGames.filter(game => game.id !== id));
 
       toast({
