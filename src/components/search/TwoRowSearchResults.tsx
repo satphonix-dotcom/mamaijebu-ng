@@ -1,100 +1,88 @@
-
 import React from 'react';
-import { Card } from '@/components/ui/card';
-import { 
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
-import { format } from 'date-fns';
+import { SearchResult } from '@/hooks/useTwoRowSearch';
+import { Card, CardContent } from '@/components/ui/card';
 
-interface TwoRowSearchResultsProps {
-  results: any[];
+export interface TwoRowSearchResultsProps {
+  results: SearchResult[];
   isSearching: boolean;
+  isMobile?: boolean;
 }
 
-export function TwoRowSearchResults({ results, isSearching }: TwoRowSearchResultsProps) {
+export function TwoRowSearchResults({ 
+  results, 
+  isSearching,
+  isMobile = false 
+}: TwoRowSearchResultsProps) {
   if (isSearching) {
     return (
-      <div className="flex justify-center my-8">
-        <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full"></div>
-      </div>
+      <Card>
+        <CardContent className="p-6">
+          <div className="flex justify-center items-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            <span className="ml-3">Searching...</span>
+          </div>
+        </CardContent>
+      </Card>
     );
   }
 
   if (results.length === 0) {
     return (
-      <Card className="p-6 text-center">
-        <p className="text-muted-foreground">
-          Enter numbers and search parameters to find two-row matches.
-        </p>
+      <Card>
+        <CardContent className="p-6">
+          <div className="text-center py-8 text-muted-foreground">
+            No results found. Try adjusting your search criteria.
+          </div>
+        </CardContent>
       </Card>
     );
   }
 
   return (
-    <Card className="overflow-hidden">
-      <Table>
-        <TableCaption>Found {results.length} matches</TableCaption>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Game</TableHead>
-            <TableHead>First Draw Date</TableHead>
-            <TableHead>First Draw #</TableHead>
-            <TableHead>First Draw Numbers</TableHead>
-            <TableHead>Second Draw Date</TableHead>
-            <TableHead>Second Draw Numbers</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {results.map((result) => (
-            <TableRow key={result.id}>
-              <TableCell className="font-medium">{result.game_name}</TableCell>
-              <TableCell>
-                {format(new Date(result.draw_date), 'dd/MM/yyyy')}
-              </TableCell>
-              <TableCell>{result.draw_number || 'N/A'}</TableCell>
-              <TableCell>
-                <div className="flex flex-wrap gap-1">
-                  {result.numbers.map((num: number, index: number) => (
-                    <span
-                      key={index}
-                      className={`inline-flex items-center justify-center h-7 w-7 rounded-full text-xs
-                        ${result.first_row_matched 
-                          ? 'bg-green-600 text-white font-bold' 
-                          : 'bg-gray-200 text-gray-800'}`}
-                    >
-                      {num}
-                    </span>
-                  ))}
-                </div>
-              </TableCell>
-              <TableCell>
-                {result.next_draw_date ? format(new Date(result.next_draw_date), 'dd/MM/yyyy') : 'N/A'}
-              </TableCell>
-              <TableCell>
-                <div className="flex flex-wrap gap-1">
-                  {result.next_draw_numbers?.map((num: number, index: number) => (
-                    <span
-                      key={index}
-                      className={`inline-flex items-center justify-center h-7 w-7 rounded-full text-xs
-                        ${result.second_row_matched 
-                          ? 'bg-green-600 text-white font-bold' 
-                          : 'bg-gray-200 text-gray-800'}`}
-                    >
-                      {num}
-                    </span>
-                  ))}
-                </div>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+    <Card>
+      <CardContent className={`${isMobile ? 'p-3' : 'p-6'}`}>
+        <div className="space-y-4">
+          <h3 className="text-lg font-medium">Search Results</h3>
+          <div className="border rounded-md">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Date
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Game
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Numbers
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Matches
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {results.map((result, index) => (
+                  <tr key={index}>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {result.date}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {result.game}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {result.numbers.join(', ')}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {result.matches}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </CardContent>
     </Card>
   );
 }
