@@ -6,6 +6,7 @@ import { LottoGame } from '@/types/supabase';
 import { ThreeRowSearchForm } from '@/components/search/ThreeRowSearchForm';
 import { ThreeRowSearchResults } from '@/components/search/ThreeRowSearchResults';
 import { useThreeRowSearch } from '@/hooks/useThreeRowSearch';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 export function ThreeRowNumbersSearch() {
   const [games, setGames] = useState<LottoGame[]>([]);
@@ -13,6 +14,7 @@ export function ThreeRowNumbersSearch() {
   const [gamesByType, setGamesByType] = useState<{[key: string]: LottoGame[]}>({});
   const { lottoTypes } = useLottoTypes();
   const { searchResults, performSearch, isSearching } = useThreeRowSearch();
+  const isMobile = useIsMobile();
 
   // Fetch games data
   useEffect(() => {
@@ -56,18 +58,20 @@ export function ThreeRowNumbersSearch() {
   }, []);
 
   return (
-    <div className="space-y-6">
+    <div className={`space-y-6 ${isMobile ? 'px-0' : ''}`}>
       <ThreeRowSearchForm 
         lottoTypes={lottoTypes}
         games={games}
         gamesByType={gamesByType}
         onSearch={performSearch}
         isSearching={isSearching}
+        isMobile={isMobile}
       />
       
       <ThreeRowSearchResults 
         results={searchResults} 
         isSearching={isSearching} 
+        isMobile={isMobile}
       />
     </div>
   );

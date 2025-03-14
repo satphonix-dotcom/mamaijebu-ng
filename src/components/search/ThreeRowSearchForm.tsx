@@ -1,4 +1,6 @@
 
+// Update the ThreeRowSearchForm with mobile-friendly styles
+// This will be similar to the existing form but with responsive layout changes
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,17 +13,25 @@ import {
 } from '@/components/ui/select';
 import { Card, CardContent } from '@/components/ui/card';
 import { LottoGame, LottoType } from '@/types/supabase';
-import { MatchLogicType, ThreeRowSearchParams } from '@/hooks/useThreeRowSearch';
+import { MatchLogicType } from '@/hooks/useThreeRowSearch';
 
 interface ThreeRowSearchFormProps {
   lottoTypes: LottoType[];
   games: LottoGame[];
   gamesByType: {[key: string]: LottoGame[]};
-  onSearch: (params: ThreeRowSearchParams) => void;
+  onSearch: (params: any) => void;
   isSearching: boolean;
+  isMobile?: boolean;
 }
 
-export function ThreeRowSearchForm({ lottoTypes, games, gamesByType, onSearch, isSearching }: ThreeRowSearchFormProps) {
+export function ThreeRowSearchForm({ 
+  lottoTypes, 
+  games, 
+  gamesByType, 
+  onSearch, 
+  isSearching,
+  isMobile = false
+}: ThreeRowSearchFormProps) {
   const [firstRowNumbers, setFirstRowNumbers] = useState<string[]>(Array(10).fill(''));
   const [secondRowNumbers, setSecondRowNumbers] = useState<string[]>(Array(10).fill(''));
   const [thirdRowNumbers, setThirdRowNumbers] = useState<string[]>(Array(10).fill(''));
@@ -75,72 +85,48 @@ export function ThreeRowSearchForm({ lottoTypes, games, gamesByType, onSearch, i
     });
   };
 
+  const renderNumberInputs = (
+    numbers: string[], 
+    handleChange: (index: number, value: string) => void,
+    rowLabel: string
+  ) => {
+    return (
+      <div>
+        <label className="block text-sm font-medium mb-2">
+          {rowLabel}
+        </label>
+        <div className={`grid ${isMobile ? 'grid-cols-5' : 'grid-cols-5 md:grid-cols-10'} gap-2`}>
+          {numbers.map((num, index) => (
+            <Input
+              key={`${rowLabel.toLowerCase().replace(/\s+/g, '-')}-${index}`}
+              className="w-full text-center"
+              value={num}
+              onChange={(e) => handleChange(index, e.target.value)}
+              type="number"
+              min="1"
+              placeholder={(index + 1).toString()}
+            />
+          ))}
+        </div>
+      </div>
+    );
+  };
+
   return (
     <Card>
-      <CardContent className="pt-6">
+      <CardContent className={`${isMobile ? 'p-4' : 'pt-6'}`}>
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* First Row of Numbers */}
-          <div>
-            <label className="block text-sm font-medium mb-2">
-              First Row Numbers (Enter numbers for the first draw)
-            </label>
-            <div className="grid grid-cols-5 md:grid-cols-10 gap-2">
-              {firstRowNumbers.map((num, index) => (
-                <Input
-                  key={`first-row-${index}`}
-                  className="w-full text-center"
-                  value={num}
-                  onChange={(e) => handleFirstRowNumberChange(index, e.target.value)}
-                  type="number"
-                  min="1"
-                  placeholder={(index + 1).toString()}
-                />
-              ))}
-            </div>
-          </div>
+          {renderNumberInputs(firstRowNumbers, handleFirstRowNumberChange, "First Row Numbers")}
 
           {/* Second Row of Numbers */}
-          <div>
-            <label className="block text-sm font-medium mb-2">
-              Second Row Numbers (Enter numbers for the second draw)
-            </label>
-            <div className="grid grid-cols-5 md:grid-cols-10 gap-2">
-              {secondRowNumbers.map((num, index) => (
-                <Input
-                  key={`second-row-${index}`}
-                  className="w-full text-center"
-                  value={num}
-                  onChange={(e) => handleSecondRowNumberChange(index, e.target.value)}
-                  type="number"
-                  min="1"
-                  placeholder={(index + 1).toString()}
-                />
-              ))}
-            </div>
-          </div>
+          {renderNumberInputs(secondRowNumbers, handleSecondRowNumberChange, "Second Row Numbers")}
 
           {/* Third Row of Numbers */}
-          <div>
-            <label className="block text-sm font-medium mb-2">
-              Third Row Numbers (Enter numbers for the third draw)
-            </label>
-            <div className="grid grid-cols-5 md:grid-cols-10 gap-2">
-              {thirdRowNumbers.map((num, index) => (
-                <Input
-                  key={`third-row-${index}`}
-                  className="w-full text-center"
-                  value={num}
-                  onChange={(e) => handleThirdRowNumberChange(index, e.target.value)}
-                  type="number"
-                  min="1"
-                  placeholder={(index + 1).toString()}
-                />
-              ))}
-            </div>
-          </div>
+          {renderNumberInputs(thirdRowNumbers, handleThirdRowNumberChange, "Third Row Numbers")}
 
-          {/* Game Type Selection */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Game Type and Specific Game Selection */}
+          <div className={`grid ${isMobile ? 'grid-cols-1 gap-4' : 'grid-cols-1 md:grid-cols-2 gap-4'}`}>
             <div className="space-y-2">
               <label className="block text-sm font-medium">
                 Game Type
@@ -162,7 +148,6 @@ export function ThreeRowSearchForm({ lottoTypes, games, gamesByType, onSearch, i
               </Select>
             </div>
 
-            {/* Specific Game Selection */}
             <div className="space-y-2">
               <label className="block text-sm font-medium">
                 Narrow Down to Game (Optional)
@@ -186,8 +171,9 @@ export function ThreeRowSearchForm({ lottoTypes, games, gamesByType, onSearch, i
             </div>
           </div>
 
-          {/* Match Logic Selection */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* Match Logic Selection for all three rows */}
+          <div className={`grid ${isMobile ? 'grid-cols-1 gap-4' : 'grid-cols-1 md:grid-cols-3 gap-4'}`}>
+            {/* First Row Match Logic */}
             <div className="space-y-2">
               <label className="block text-sm font-medium">
                 @row1 (Match in First Row)
@@ -210,6 +196,7 @@ export function ThreeRowSearchForm({ lottoTypes, games, gamesByType, onSearch, i
               </Select>
             </div>
 
+            {/* Second Row Match Logic */}
             <div className="space-y-2">
               <label className="block text-sm font-medium">
                 @row2 (Match in Second Row)
@@ -232,6 +219,7 @@ export function ThreeRowSearchForm({ lottoTypes, games, gamesByType, onSearch, i
               </Select>
             </div>
 
+            {/* Third Row Match Logic */}
             <div className="space-y-2">
               <label className="block text-sm font-medium">
                 @row3 (Match in Third Row)
