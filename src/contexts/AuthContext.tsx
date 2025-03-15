@@ -17,7 +17,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isAdmin, setIsAdmin] = useState(false);
   const [isPremium, setIsPremium] = useState(false);
   
-  const { signIn, signUp, signOut, upgradeToPremium: upgradeUserToPremium } = useAuthOperations();
+  const { signIn, signUp, signOut: authSignOut, upgradeToPremium: upgradeUserToPremium } = useAuthOperations();
 
   // Function to update profile state
   const updateProfileState = (profileData: Profile | null) => {
@@ -76,6 +76,21 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     };
   }, []);
 
+  // Wrapper for signOut to reset local state
+  const handleSignOut = async () => {
+    try {
+      await authSignOut();
+      // Clear all auth state
+      setSession(null);
+      setUser(null);
+      updateProfileState(null);
+      // Force a page reload to ensure all state is cleared
+      window.location.href = '/';
+    } catch (error) {
+      console.error('Error during sign out:', error);
+    }
+  };
+
   // Wrapper for upgradeToPremium to update local state
   const upgradeToPremium = async () => {
     if (!user) return false;
@@ -100,7 +115,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         isLoading,
         signIn,
         signUp,
-        signOut,
+        signOut: handleSignOut,
         isAdmin,
         isPremium,
         upgradeToPremium,
