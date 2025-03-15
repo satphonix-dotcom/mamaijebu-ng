@@ -2,8 +2,12 @@
 import { Layout } from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Search, ChevronRight, Database, LineChart, Shield } from "lucide-react";
+import { Link } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Index = () => {
+  const { user } = useAuth();
+  
   return (
     <Layout>
       <div className="animate-fadeIn">
@@ -18,11 +22,15 @@ const Index = () => {
                 Advanced analytics and pattern recognition for lottery enthusiasts. Search through historical data, analyze trends, and make informed decisions.
               </p>
               <div className="mt-10 flex items-center justify-center gap-x-6">
-                <Button className="bg-primary-400 hover:bg-primary-500">
-                  Get Started
-                  <ChevronRight className="ml-2 h-4 w-4" />
-                </Button>
-                <Button variant="outline">Learn More</Button>
+                <Link to={user ? "/dashboard" : "/login"}>
+                  <Button className="bg-primary-400 hover:bg-primary-500">
+                    Get Started
+                    <ChevronRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </Link>
+                <Link to="/search">
+                  <Button variant="outline">Learn More</Button>
+                </Link>
               </div>
             </div>
           </div>
@@ -91,9 +99,11 @@ const Index = () => {
                 Join thousands of lottery enthusiasts who use our platform to make data-driven decisions.
               </p>
               <div className="mt-10 flex items-center justify-center gap-x-6">
-                <Button className="bg-primary-400 hover:bg-primary-500">
-                  Start Free Trial
-                </Button>
+                <Link to="/premium">
+                  <Button className="bg-primary-400 hover:bg-primary-500">
+                    Start Free Trial
+                  </Button>
+                </Link>
               </div>
             </div>
           </div>

@@ -1,4 +1,3 @@
-
 import { createContext, useContext, useEffect, useState } from 'react';
 import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -14,7 +13,7 @@ type AuthContextType = {
   signOut: () => Promise<void>;
   isAdmin: boolean;
   isPremium: boolean;
-  upgradeToPremeium: () => Promise<boolean>;
+  upgradeToPremium: () => Promise<boolean>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -142,7 +141,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  const upgradeToPremeium = async () => {
+  const upgradeToPremium = async () => {
     if (!user) return false;
     
     try {
@@ -199,7 +198,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         signOut,
         isAdmin,
         isPremium,
-        upgradeToPremeium,
+        upgradeToPremium,
       }}
     >
       {children}

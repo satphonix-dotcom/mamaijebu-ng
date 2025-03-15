@@ -24,7 +24,7 @@ import {
 import { Menu } from "lucide-react";
 
 const Navbar = () => {
-  const { user, signOut, isAdmin } = useAuth();
+  const { user, signOut, isAdmin, isPremium } = useAuth();
   const { pathname } = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -131,6 +131,15 @@ const Navbar = () => {
                   Admin
                 </Link>
               )}
+              {user && (
+                <Link
+                  to="/premium"
+                  className="hover:text-primary"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  {isPremium ? "Premium Active" : "Upgrade to Premium"}
+                </Link>
+              )}
             </nav>
           </SheetContent>
         </Sheet>
@@ -152,7 +161,7 @@ const Navbar = () => {
                 <div className="flex flex-col space-y-1">
                   <p className="text-sm font-medium leading-none">{user?.email}</p>
                   <p className="text-xs leading-none text-muted-foreground">
-                    {isAdmin ? "Administrator" : "User"}
+                    {isAdmin ? "Administrator" : isPremium ? "Premium User" : "User"}
                   </p>
                 </div>
               </DropdownMenuLabel>
@@ -160,6 +169,11 @@ const Navbar = () => {
               <DropdownMenuItem asChild>
                 <Link to="/dashboard">Dashboard</Link>
               </DropdownMenuItem>
+              {!isPremium && (
+                <DropdownMenuItem asChild>
+                  <Link to="/premium">Upgrade to Premium</Link>
+                </DropdownMenuItem>
+              )}
               {isAdmin && (
                 <DropdownMenuItem asChild>
                   <Link to="/admin/dashboard">Admin Dashboard</Link>
