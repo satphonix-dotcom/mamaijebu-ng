@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
@@ -27,6 +27,14 @@ const Navbar = () => {
   const { user, signOut, isAdmin, isPremium } = useAuth();
   const { pathname } = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  
+  // Log admin status for debugging
+  useEffect(() => {
+    if (user) {
+      console.log('Navbar - User logged in:', user.email);
+      console.log('Navbar - Is admin:', isAdmin);
+    }
+  }, [user, isAdmin]);
 
   return (
     <header className="bg-background border-b sticky top-0 z-30">

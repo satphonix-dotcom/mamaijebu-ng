@@ -4,6 +4,8 @@ import { Profile } from '@/types/supabase';
 
 export async function fetchUserProfile(userId: string): Promise<Profile | null> {
   try {
+    console.log('Fetching profile for user ID:', userId);
+    
     const { data, error } = await supabase
       .from('profiles')
       .select('*')
@@ -15,6 +17,7 @@ export async function fetchUserProfile(userId: string): Promise<Profile | null> 
       return null;
     }
     
+    console.log('Profile data retrieved:', data);
     return data;
   } catch (error) {
     console.error('Unexpected error fetching profile:', error);

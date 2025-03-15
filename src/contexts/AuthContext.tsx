@@ -25,6 +25,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setProfile(profileData);
       setIsAdmin(profileData.is_admin || false);
       setIsPremium(profileData.is_premium || false);
+      
+      // Log admin status for debugging
+      console.log('User profile loaded:', profileData);
+      console.log('Is admin:', profileData.is_admin);
+      console.log('Is premium:', profileData.is_premium);
     } else {
       setProfile(null);
       setIsAdmin(false);
