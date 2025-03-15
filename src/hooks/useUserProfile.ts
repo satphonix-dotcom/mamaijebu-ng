@@ -18,6 +18,12 @@ export async function fetchUserProfile(userId: string): Promise<Profile | null> 
     }
     
     console.log('Profile data retrieved:', data);
+    // Explicitly log if this user is an admin
+    if (data && data.is_admin) {
+      console.log('THIS USER IS AN ADMIN:', data.email);
+    } else {
+      console.log('User is not an admin or admin status not set');
+    }
     return data;
   } catch (error) {
     console.error('Unexpected error fetching profile:', error);

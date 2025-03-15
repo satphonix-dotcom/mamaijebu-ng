@@ -2,7 +2,7 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Profile } from "@/types/supabase";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -20,16 +20,20 @@ export function EditUserDialog({ isOpen, onOpenChange, user, onSave }: EditUserD
   const [isSaving, setIsSaving] = useState(false);
 
   // Update form state when user prop changes
-  if (user && user.email !== email) {
-    setEmail(user.email);
-    setIsAdmin(user.is_admin || false);
-  }
+  useEffect(() => {
+    if (user) {
+      setEmail(user.email);
+      setIsAdmin(user.is_admin || false);
+      console.log('EditUserDialog - Loading user:', user.email, 'Admin status:', user.is_admin);
+    }
+  }, [user]);
 
   const handleSave = async () => {
     if (!user) return;
     
     setIsSaving(true);
     try {
+      console.log('Saving user with updated admin status:', isAdmin);
       await onSave({
         ...user,
         email,

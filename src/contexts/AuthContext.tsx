@@ -23,13 +23,19 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const updateProfileState = (profileData: Profile | null) => {
     if (profileData) {
       setProfile(profileData);
-      setIsAdmin(profileData.is_admin || false);
+      const adminStatus = profileData.is_admin || false;
+      setIsAdmin(adminStatus);
       setIsPremium(profileData.is_premium || false);
       
-      // Log admin status for debugging
+      // Enhanced logging for admin status
       console.log('User profile loaded:', profileData);
-      console.log('Is admin:', profileData.is_admin);
+      console.log('Is admin:', adminStatus, typeof adminStatus);
       console.log('Is premium:', profileData.is_premium);
+      
+      // Force refresh if admin status changes
+      if (adminStatus !== isAdmin) {
+        console.log('Admin status changed from', isAdmin, 'to', adminStatus);
+      }
     } else {
       setProfile(null);
       setIsAdmin(false);
@@ -41,6 +47,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const getSession = async () => {
       setIsLoading(true);
       try {
+        console.log('Getting initial session');
         const { data: { session }, error } = await supabase.auth.getSession();
         if (error) {
           console.error('Error getting session:', error);
@@ -49,6 +56,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           setUser(session?.user ?? null);
 
           if (session?.user) {
+            console.log('Session found for user:', session.user.email);
             const profileData = await fetchUserProfile(session.user.id);
             updateProfileState(profileData);
           }
@@ -64,13 +72,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (_event, session) => {
+        console.log('Auth state changed, event:', _event);
         setSession(session);
         setUser(session?.user ?? null);
 
         if (session?.user) {
+          console.log('User authenticated:', session.user.email);
           const profileData = await fetchUserProfile(session.user.id);
           updateProfileState(profileData);
         } else {
+          console.log('User logged out or no session');
           updateProfileState(null);
         }
       }
@@ -110,6 +121,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     
     return success;
   };
+
+  // Extra debug information for admin status
+  useEffect(() => {
+    if (user) {
+      console.log('AuthContext - Current state:');
+      console.log('- User:', user.email);
+      console.log('- isAdmin state:', isAdmin);
+      console.log('- Profile admin flag:', profile?.is_admin);
+    }
+  }, [user, isAdmin, profile]);
 
   return (
     <AuthContext.Provider

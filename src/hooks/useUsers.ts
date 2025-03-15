@@ -73,17 +73,25 @@ export function useUsers() {
 
   const updateUser = async (updatedUser: Profile) => {
     try {
-      const { error } = await supabase
+      console.log('Updating user in database:', updatedUser.id);
+      console.log('New admin status:', updatedUser.is_admin);
+      
+      const { data, error } = await supabase
         .from('profiles')
         .update({
           email: updatedUser.email,
           is_admin: updatedUser.is_admin,
         })
-        .eq('id', updatedUser.id);
+        .eq('id', updatedUser.id)
+        .select();
 
       if (error) throw error;
+      
+      console.log('Update response from database:', data);
 
-      setUsers(users.map(user => (user.id === updatedUser.id ? updatedUser : user)));
+      // Refresh user list to ensure we have the latest data
+      await fetchUsers();
+      
       toast({
         title: 'User updated',
         description: 'User has been successfully updated.',
