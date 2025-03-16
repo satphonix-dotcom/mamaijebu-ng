@@ -11,17 +11,20 @@ import { UserMenu } from "./UserMenu";
 import { BrandLogo } from "./BrandLogo";
 
 const Navbar = () => {
-  const { user, signOut, isAdmin, isPremium } = useAuth();
+  const { user, signOut, isAdmin, isPremium, refreshUserProfile } = useAuth();
   const { pathname } = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   
   // Log admin status for debugging
   useEffect(() => {
     if (user) {
-      console.log('Navbar - User logged in:', user.email);
-      console.log('Navbar - Is admin:', isAdmin);
+      console.log('[Navbar] User logged in:', user.email);
+      console.log('[Navbar] Is admin:', isAdmin, 'Type:', typeof isAdmin);
+      
+      // Force refresh user profile on component mount
+      refreshUserProfile();
     }
-  }, [user, isAdmin]);
+  }, [user, isAdmin, refreshUserProfile]);
 
   return (
     <header className="bg-background border-b sticky top-0 z-30">

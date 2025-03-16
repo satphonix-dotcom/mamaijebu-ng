@@ -17,13 +17,14 @@ export async function fetchUserProfile(userId: string): Promise<Profile | null> 
       return null;
     }
     
-    console.log('Profile data retrieved:', data);
-    // Explicitly log if this user is an admin
-    if (data && data.is_admin) {
-      console.log('THIS USER IS AN ADMIN:', data.email, data.is_admin);
-    } else {
-      console.log('User is not an admin or admin status not set:', data?.email, 'is_admin value:', data?.is_admin);
+    // Convert is_admin to proper boolean to avoid type issues
+    if (data) {
+      data.is_admin = data.is_admin === true;
+      console.log('Profile data retrieved:', data);
+      console.log('THIS USER IS ADMIN STATUS:', data.is_admin, 'Type:', typeof data.is_admin);
+      console.log('Raw admin database value:', data.is_admin);
     }
+    
     return data;
   } catch (error) {
     console.error('Unexpected error fetching profile:', error);

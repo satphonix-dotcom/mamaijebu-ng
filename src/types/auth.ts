@@ -13,4 +13,5 @@ export type AuthContextType = {
   isAdmin: boolean;
   isPremium: boolean;
   upgradeToPremium: () => Promise<boolean>;
+  refreshUserProfile: () => Promise<void>;
 };

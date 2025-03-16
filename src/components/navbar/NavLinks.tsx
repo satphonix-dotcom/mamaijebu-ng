@@ -11,13 +11,17 @@ interface NavLinksProps {
 }
 
 export const NavLinks: React.FC<NavLinksProps> = ({ pathname, isAdmin, user }) => {
-  // Enhanced debug for admin status
+  // Debug for admin status
   useEffect(() => {
-    console.log('NavLinks - Admin status check:', isAdmin);
+    console.log('[NavLinks] Rendering with admin status:', isAdmin);
+    console.log('[NavLinks] Admin status type:', typeof isAdmin);
+    console.log('[NavLinks] User email:', user?.email);
     if (isAdmin) {
-      console.log('Admin links should be visible');
+      console.log('[NavLinks] ✅ Admin links should be visible for', user?.email);
+    } else {
+      console.log('[NavLinks] ❌ Admin links hidden for', user?.email);
     }
-  }, [isAdmin]);
+  }, [isAdmin, user]);
   
   return (
     <nav className="hidden md:flex gap-6">
@@ -60,15 +64,19 @@ export const NavLinks: React.FC<NavLinksProps> = ({ pathname, isAdmin, user }) =
         </Link>
       )}
       {isAdmin && (
-        <Link
-          to="/admin/dashboard"
-          className={cn(
-            "text-sm font-medium transition-colors hover:text-primary",
-            pathname.startsWith("/admin") ? "text-foreground" : "text-muted-foreground"
-          )}
-        >
-          Admin
-        </Link>
+        <>
+          <Link
+            to="/admin/dashboard"
+            className={cn(
+              "text-sm font-medium transition-colors hover:text-primary",
+              pathname.startsWith("/admin") ? "text-foreground" : "text-muted-foreground"
+            )}
+          >
+            Admin
+          </Link>
+          {/* For debugging - Remove this in production */}
+          <span className="text-xs text-green-500">Admin: {String(isAdmin)}</span>
+        </>
       )}
     </nav>
   );

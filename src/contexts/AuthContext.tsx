@@ -25,25 +25,34 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       // Set profile first to ensure it's available
       setProfile(profileData);
       
-      // Parse admin status with explicit boolean conversion and debug logging
-      const adminStatus = profileData.is_admin === true;
-      const premiumStatus = profileData.is_premium === true;
+      // Force the admin status to be a boolean and log it
+      const adminStatus = Boolean(profileData.is_admin);
+      const premiumStatus = Boolean(profileData.is_premium);
       
-      console.log('Updating profile state for:', profileData.email);
-      console.log('Raw admin value:', profileData.is_admin);
-      console.log('Parsed admin status:', adminStatus);
-      console.log('Current admin state:', isAdmin);
+      console.log('[AuthContext] Updating profile state for:', profileData.email);
+      console.log('[AuthContext] Raw admin value from database:', profileData.is_admin);
+      console.log('[AuthContext] Parsed admin status:', adminStatus);
+      console.log('[AuthContext] Admin status type:', typeof adminStatus);
       
       // Set the admin and premium statuses
       setIsAdmin(adminStatus);
       setIsPremium(premiumStatus);
       
-      console.log('Admin status set to:', adminStatus);
+      console.log('[AuthContext] Admin status now set to:', adminStatus);
     } else {
-      console.log('No profile data, resetting states');
+      console.log('[AuthContext] No profile data, resetting states');
       setProfile(null);
       setIsAdmin(false);
       setIsPremium(false);
+    }
+  };
+
+  // Force refresh of user profile when admin status might have changed
+  const refreshUserProfile = async () => {
+    if (user) {
+      console.log('[AuthContext] Manually refreshing user profile');
+      const profileData = await fetchUserProfile(user.id);
+      await updateProfileState(profileData);
     }
   };
 
@@ -51,22 +60,22 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const getSession = async () => {
       setIsLoading(true);
       try {
-        console.log('Getting initial session');
+        console.log('[AuthContext] Getting initial session');
         const { data: { session }, error } = await supabase.auth.getSession();
         if (error) {
-          console.error('Error getting session:', error);
+          console.error('[AuthContext] Error getting session:', error);
         } else {
           setSession(session);
           setUser(session?.user ?? null);
 
           if (session?.user) {
-            console.log('Session found for user:', session.user.email);
+            console.log('[AuthContext] Session found for user:', session.user.email);
             const profileData = await fetchUserProfile(session.user.id);
             await updateProfileState(profileData);
           }
         }
       } catch (error) {
-        console.error('Unexpected error:', error);
+        console.error('[AuthContext] Unexpected error:', error);
       } finally {
         setIsLoading(false);
       }
@@ -76,16 +85,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (_event, session) => {
-        console.log('Auth state changed, event:', _event);
+        console.log('[AuthContext] Auth state changed, event:', _event);
         setSession(session);
         setUser(session?.user ?? null);
 
         if (session?.user) {
-          console.log('User authenticated:', session.user.email);
+          console.log('[AuthContext] User authenticated:', session.user.email);
           const profileData = await fetchUserProfile(session.user.id);
           await updateProfileState(profileData);
         } else {
-          console.log('User logged out or no session');
+          console.log('[AuthContext] User logged out or no session');
           await updateProfileState(null);
         }
       }
@@ -99,7 +108,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   // Wrapper for signOut to reset local state
   const handleSignOut = async () => {
     try {
-      console.log('AuthContext: Starting sign out process');
+      console.log('[AuthContext] Starting sign out process');
       
       // Clear all auth state first to prevent UI flicker
       setSession(null);
@@ -108,12 +117,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       
       // Then call the actual signOut from supabase
       await authSignOut();
-      console.log('AuthContext: Sign out completed, redirecting to home page');
+      console.log('[AuthContext] Sign out completed, redirecting to home page');
       
       // Force a page reload to ensure all state is cleared
       window.location.href = '/';
     } catch (error) {
-      console.error('Error during sign out:', error);
+      console.error('[AuthContext] Error during sign out:', error);
       throw error; // Rethrow to allow proper error handling
     }
   };
@@ -136,7 +145,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   // Extra debug information for admin status
   useEffect(() => {
     if (user) {
-      console.log('AuthContext - Current state:');
+      console.log('[AuthContext] Current state:');
       console.log('- User:', user.email);
       console.log('- isAdmin state:', isAdmin);
       console.log('- Profile admin flag:', profile?.is_admin);
@@ -156,6 +165,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         isAdmin,
         isPremium,
         upgradeToPremium,
+        refreshUserProfile,
       }}
     >
       {children}

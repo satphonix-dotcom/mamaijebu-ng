@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface EditUserDialogProps {
   isOpen: boolean;
@@ -16,17 +17,21 @@ interface EditUserDialogProps {
 
 export function EditUserDialog({ isOpen, onOpenChange, user, onSave }: EditUserDialogProps) {
   const [email, setEmail] = useState<string>(user?.email || "");
-  const [isAdmin, setIsAdmin] = useState<boolean>(user?.is_admin || false);
+  const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const [isSaving, setIsSaving] = useState(false);
+  const { refreshUserProfile } = useAuth();
 
   // Update form state when user prop changes
   useEffect(() => {
     if (user) {
       setEmail(user.email);
-      // Ensure boolean conversion for is_admin
-      const adminStatus = user.is_admin === true;
+      // Ensure boolean conversion for is_admin and log the conversion
+      const adminStatus = Boolean(user.is_admin);
       setIsAdmin(adminStatus);
-      console.log('EditUserDialog - Loading user:', user.email, 'Admin status:', adminStatus, 'Raw value:', user.is_admin);
+      console.log('[EditUserDialog] Loading user:', user.email);
+      console.log('[EditUserDialog] Admin status type:', typeof user.is_admin);
+      console.log('[EditUserDialog] Raw admin value:', user.is_admin);
+      console.log('[EditUserDialog] Converted admin status:', adminStatus);
     }
   }, [user]);
 
@@ -35,15 +40,20 @@ export function EditUserDialog({ isOpen, onOpenChange, user, onSave }: EditUserD
     
     setIsSaving(true);
     try {
-      console.log('Saving user with updated admin status:', isAdmin);
+      console.log('[EditUserDialog] Saving user with updated admin status:', isAdmin);
+      
       await onSave({
         ...user,
         email,
         is_admin: isAdmin,
       });
-      console.log('User saved successfully with admin status:', isAdmin);
+      
+      console.log('[EditUserDialog] User saved successfully with admin status:', isAdmin);
+      
+      // Refresh the current user's profile if needed
+      await refreshUserProfile();
     } catch (error) {
-      console.error('Error saving user:', error);
+      console.error('[EditUserDialog] Error saving user:', error);
     } finally {
       setIsSaving(false);
     }
@@ -77,7 +87,7 @@ export function EditUserDialog({ isOpen, onOpenChange, user, onSave }: EditUserD
                 checked={isAdmin}
                 onCheckedChange={(checked) => {
                   const newValue = checked === true;
-                  console.log('Checkbox changed to:', newValue);
+                  console.log('[EditUserDialog] Checkbox changed to:', newValue);
                   setIsAdmin(newValue);
                 }}
               />
