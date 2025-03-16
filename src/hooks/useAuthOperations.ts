@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { fetchUserProfile } from './useUserProfile';
 
@@ -33,10 +32,15 @@ export const useAuthOperations = () => {
 
   const signOut = async () => {
     try {
+      console.log('useAuthOperations: Calling Supabase signOut');
       const { error } = await supabase.auth.signOut();
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase signOut error:', error);
+        throw error;
+      }
+      console.log('useAuthOperations: Supabase signOut successful');
     } catch (error) {
-      console.error('Error signing out:', error);
+      console.error('Error in signOut operation:', error);
       throw error;
     }
   };

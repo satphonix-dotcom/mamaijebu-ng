@@ -21,6 +21,17 @@ interface UserMenuProps {
 }
 
 export const UserMenu: React.FC<UserMenuProps> = ({ user, isAdmin, isPremium, signOut }) => {
+  // Handle sign out with proper error handling
+  const handleSignOut = async () => {
+    try {
+      console.log("Signing out user...");
+      await signOut();
+      console.log("User signed out successfully");
+    } catch (error) {
+      console.error("Error signing out:", error);
+    }
+  };
+
   if (!user) {
     return (
       <Link to="/login">
@@ -64,7 +75,7 @@ export const UserMenu: React.FC<UserMenuProps> = ({ user, isAdmin, isPremium, si
             <Link to="/admin/dashboard">Admin Dashboard</Link>
           </DropdownMenuItem>
         )}
-        <DropdownMenuItem onClick={() => signOut()}>
+        <DropdownMenuItem onClick={handleSignOut}>
           Logout
         </DropdownMenuItem>
       </DropdownMenuContent>

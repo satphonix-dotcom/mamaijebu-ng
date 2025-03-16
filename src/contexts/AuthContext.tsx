@@ -1,4 +1,3 @@
-
 import { createContext, useContext, useEffect, useState } from 'react';
 import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -95,15 +94,22 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   // Wrapper for signOut to reset local state
   const handleSignOut = async () => {
     try {
-      await authSignOut();
-      // Clear all auth state
+      console.log('AuthContext: Starting sign out process');
+      
+      // Clear all auth state first to prevent UI flicker
       setSession(null);
       setUser(null);
       updateProfileState(null);
+      
+      // Then call the actual signOut from supabase
+      await authSignOut();
+      console.log('AuthContext: Sign out completed, redirecting to home page');
+      
       // Force a page reload to ensure all state is cleared
       window.location.href = '/';
     } catch (error) {
       console.error('Error during sign out:', error);
+      throw error; // Rethrow to allow proper error handling
     }
   };
 
