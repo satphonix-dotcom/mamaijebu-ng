@@ -1,16 +1,23 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 
 export const AdminLayout = ({ children }: { children: React.ReactNode }) => {
-  const { isAdmin, isLoading } = useAuth();
+  const { isAdmin, isLoading, refreshUserProfile } = useAuth();
   const navigate = useNavigate();
 
+  // Force refresh user profile when admin page loads
+  useEffect(() => {
+    refreshUserProfile();
+    console.log('[AdminLayout] Refreshed user profile, isAdmin:', isAdmin);
+  }, [refreshUserProfile]);
+
   // Redirect if not admin
-  React.useEffect(() => {
+  useEffect(() => {
     if (!isLoading && !isAdmin) {
+      console.log('[AdminLayout] User is not admin, redirecting to home');
       navigate('/');
     }
   }, [isAdmin, isLoading, navigate]);
