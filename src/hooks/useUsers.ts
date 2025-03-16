@@ -1,11 +1,13 @@
 
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { Profile } from '@/types/supabase';
+import { Profile, UserRole } from '@/types/supabase';
 import { useToast } from '@/components/ui/use-toast';
+import { fetchUserRoles, addUserRole, removeUserRole } from './useUserProfile';
 
 export function useUsers() {
   const [users, setUsers] = useState<Profile[]>([]);
+  const [userRoles, setUserRoles] = useState<Record<string, UserRole[]>>({});
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
 
@@ -24,14 +26,19 @@ export function useUsers() {
       }
       
       console.log('Fetched users:', data?.length || 0);
-      console.log('User data:', data); // Log the actual user data for debugging
       
       // If data exists, sort it before setting
       const sortedData = data ? [...data].sort((a, b) => 
         new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
       ) : [];
       
-      // Ensure we're setting all users we get back
+      // Fetch roles for each user
+      const rolesMap: Record<string, UserRole[]> = {};
+      for (const user of sortedData) {
+        rolesMap[user.id] = await fetchUserRoles(user.id);
+      }
+      
+      setUserRoles(rolesMap);
       setUsers(sortedData);
     } catch (error) {
       console.error('Error fetching users:', error);
@@ -71,24 +78,47 @@ export function useUsers() {
     }
   };
 
-  const updateUser = async (updatedUser: Profile) => {
+  const updateUser = async (updatedUser: Profile, newRoles: UserRole[]) => {
     try {
       console.log('Updating user in database:', updatedUser.id);
-      console.log('New admin status:', updatedUser.is_admin);
+      console.log('New roles:', newRoles);
       
+      // Update the profile information
       const { data, error } = await supabase
         .from('profiles')
         .update({
           email: updatedUser.email,
-          is_admin: updatedUser.is_admin,
         })
         .eq('id', updatedUser.id)
         .select();
 
       if (error) throw error;
       
-      console.log('Update response from database:', data);
-
+      // Get current roles for comparison
+      const currentRoles = userRoles[updatedUser.id] || [];
+      
+      // For each role in newRoles that's not in currentRoles, add it
+      const rolesToAdd = newRoles.filter(role => !currentRoles.includes(role));
+      
+      // For each role in currentRoles that's not in newRoles, remove it
+      const rolesToRemove = currentRoles.filter(role => !newRoles.includes(role));
+      
+      // Add new roles
+      for (const role of rolesToAdd) {
+        await addUserRole(updatedUser.id, role);
+      }
+      
+      // Remove old roles
+      for (const role of rolesToRemove) {
+        await removeUserRole(updatedUser.id, role);
+      }
+      
+      // Update the local state with the new roles
+      setUserRoles(prevRoles => ({
+        ...prevRoles,
+        [updatedUser.id]: newRoles
+      }));
+      
       // Refresh user list to ensure we have the latest data
       await fetchUsers();
       
@@ -108,11 +138,16 @@ export function useUsers() {
     }
   };
 
+  const getUserRoles = (userId: string): UserRole[] => {
+    return userRoles[userId] || [];
+  };
+
   return {
     users,
     isLoading,
     fetchUsers,
     deleteUser,
-    updateUser
+    updateUser,
+    getUserRoles
   };
 }

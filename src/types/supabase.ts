@@ -25,6 +25,9 @@ export type LottoType = Database['public']['Tables']['lotto_types']['Row'] & {
   };
 };
 
+// Custom type for user roles
+export type UserRole = 'user' | 'premium' | 'admin';
+
 // Define insert types
 export type ProfileInsert = Database['public']['Tables']['profiles']['Insert'];
 export type LottoGameInsert = Database['public']['Tables']['lotto_games']['Insert'];

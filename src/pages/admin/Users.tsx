@@ -1,97 +1,92 @@
 
 import { useEffect, useState } from 'react';
-import { AdminLayout } from '@/components/AdminLayout';
-import { Profile } from '@/types/supabase';
-import { Button } from '@/components/ui/button';
-import { RefreshCw } from 'lucide-react';
-import { DeleteUserDialog } from '@/components/admin/users/DeleteUserDialog';
-import { EditUserDialog } from '@/components/admin/users/EditUserDialog';
 import { UsersTable } from '@/components/admin/users/UsersTable';
+import { EditUserDialog } from '@/components/admin/users/EditUserDialog';
+import { DeleteUserDialog } from '@/components/admin/users/DeleteUserDialog';
+import { Button } from '@/components/ui/button';
+import { AdminLayout } from '@/components/AdminLayout';
 import { useUsers } from '@/hooks/useUsers';
-import { useToast } from '@/components/ui/use-toast';
-import { useAuth } from '@/contexts/AuthContext';
+import { Profile, UserRole } from '@/types/supabase';
+import { CreateUserDialog } from '@/components/admin/users/CreateUserDialog';
 
-export default function Users() {
-  const { users, isLoading, fetchUsers, deleteUser, updateUser } = useUsers();
-  const [userToDelete, setUserToDelete] = useState<Profile | null>(null);
-  const [userToEdit, setUserToEdit] = useState<Profile | null>(null);
-  const { toast } = useToast();
-  const { user } = useAuth();
+const Users = () => {
+  const { users, isLoading, fetchUsers, deleteUser, updateUser, getUserRoles } = useUsers();
+  const [selectedUser, setSelectedUser] = useState<Profile | null>(null);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
 
-  // Fetch users on initial mount
   useEffect(() => {
-    console.log('Users component mounted, fetching users');
     fetchUsers();
   }, []);
 
+  const handleEdit = (user: Profile) => {
+    setSelectedUser(user);
+    setIsEditDialogOpen(true);
+  };
+
+  const handleDelete = (user: Profile) => {
+    setSelectedUser(user);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const handleCreate = () => {
+    setIsCreateDialogOpen(true);
+  };
+
+  const handleSaveUser = async (user: Profile, roles: UserRole[]) => {
+    await updateUser(user, roles);
+    setIsEditDialogOpen(false);
+  };
+
   const handleDeleteUser = async () => {
-    if (!userToDelete) return;
-    
-    const success = await deleteUser(userToDelete.id);
-    if (success) {
-      setUserToDelete(null);
+    if (selectedUser) {
+      await deleteUser(selectedUser.id);
+      setIsDeleteDialogOpen(false);
     }
-  };
-
-  const handleUpdateUser = async (updatedUser: Profile) => {
-    const success = await updateUser(updatedUser);
-    if (success) {
-      setUserToEdit(null);
-    }
-  };
-
-  const handleRefresh = async () => {
-    console.log('Refreshing user list');
-    await fetchUsers();
-    toast({
-      title: 'User list refreshed',
-      description: 'The user list has been updated with the latest data.'
-    });
   };
 
   return (
     <AdminLayout>
-      <div className="container mx-auto p-4">
+      <div className="container mx-auto py-8">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold">User Management</h1>
-          <div className="flex space-x-2">
-            <Button variant="outline" onClick={handleRefresh} disabled={isLoading}>
-              <RefreshCw className="h-4 w-4 mr-2" />
-              Refresh
-            </Button>
-          </div>
+          <h1 className="text-2xl font-bold">Manage Users</h1>
+          <Button onClick={handleCreate}>Create User</Button>
         </div>
 
         {isLoading ? (
-          <div className="flex items-center justify-center h-32">Loading users...</div>
+          <div className="text-center py-4">Loading users...</div>
         ) : (
-          <>
-            <div className="mb-4">
-              <p>Total users: <span className="font-bold">{users.length}</span></p>
-              <p className="text-sm text-muted-foreground">Currently logged in as: {user?.email}</p>
-            </div>
-            <UsersTable 
-              users={users}
-              onEdit={setUserToEdit}
-              onDelete={setUserToDelete}
-            />
-          </>
+          <UsersTable 
+            users={users} 
+            userRoles={getUserRoles}
+            onEdit={handleEdit} 
+            onDelete={handleDelete} 
+          />
         )}
 
-        <DeleteUserDialog 
-          isOpen={!!userToDelete} 
-          onOpenChange={(open) => !open && setUserToDelete(null)}
-          onConfirm={handleDeleteUser}
-          onCancel={() => setUserToDelete(null)}
+        <EditUserDialog 
+          isOpen={isEditDialogOpen} 
+          onOpenChange={setIsEditDialogOpen} 
+          user={selectedUser} 
+          userRoles={selectedUser ? getUserRoles(selectedUser.id) : []}
+          onSave={handleSaveUser} 
         />
 
-        <EditUserDialog 
-          isOpen={!!userToEdit}
-          onOpenChange={(open) => !open && setUserToEdit(null)}
-          user={userToEdit}
-          onSave={handleUpdateUser}
+        <DeleteUserDialog 
+          isOpen={isDeleteDialogOpen} 
+          onOpenChange={setIsDeleteDialogOpen} 
+          onDelete={handleDeleteUser} 
+        />
+
+        <CreateUserDialog 
+          isOpen={isCreateDialogOpen} 
+          onOpenChange={setIsCreateDialogOpen}
+          onUserCreated={() => fetchUsers()}
         />
       </div>
     </AdminLayout>
   );
-}
+};
+
+export default Users;

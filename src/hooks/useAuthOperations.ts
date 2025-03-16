@@ -1,5 +1,7 @@
+
 import { supabase } from '@/integrations/supabase/client';
-import { fetchUserProfile } from './useUserProfile';
+import { fetchUserProfile, addUserRole } from './useUserProfile';
+import { UserRole } from '@/types/supabase';
 
 export const useAuthOperations = () => {
   const signIn = async (email: string, password: string) => {
@@ -51,7 +53,15 @@ export const useAuthOperations = () => {
     try {
       console.log('Upgrading user to premium:', userId);
       
-      // First, update the database
+      // Try adding the premium role first
+      const roleSuccess = await addUserRole(userId, 'premium' as UserRole);
+      
+      if (roleSuccess) {
+        console.log('Premium role added successfully');
+        return true;
+      }
+      
+      // Fall back to legacy method
       const { data, error } = await supabase
         .from('profiles')
         .update({ is_premium: true })

@@ -1,5 +1,5 @@
 
-import { Profile } from '@/types/supabase';
+import { Profile, UserRole } from '@/types/supabase';
 import { Button } from '@/components/ui/button';
 import {
   Table,
@@ -9,14 +9,16 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
 
 interface UsersTableProps {
   users: Profile[];
+  userRoles: (userId: string) => UserRole[];
   onEdit: (user: Profile) => void;
   onDelete: (user: Profile) => void;
 }
 
-export function UsersTable({ users, onEdit, onDelete }: UsersTableProps) {
+export function UsersTable({ users, userRoles, onEdit, onDelete }: UsersTableProps) {
   if (users.length === 0) {
     return (
       <div className="border rounded-md">
@@ -24,7 +26,7 @@ export function UsersTable({ users, onEdit, onDelete }: UsersTableProps) {
           <TableHeader>
             <TableRow>
               <TableHead>Email</TableHead>
-              <TableHead>Admin Status</TableHead>
+              <TableHead>Roles</TableHead>
               <TableHead>Created At</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
@@ -47,7 +49,7 @@ export function UsersTable({ users, onEdit, onDelete }: UsersTableProps) {
         <TableHeader>
           <TableRow>
             <TableHead>Email</TableHead>
-            <TableHead>Admin Status</TableHead>
+            <TableHead>Roles</TableHead>
             <TableHead>Created At</TableHead>
             <TableHead className="text-right">Actions</TableHead>
           </TableRow>
@@ -56,7 +58,21 @@ export function UsersTable({ users, onEdit, onDelete }: UsersTableProps) {
           {users.map((user) => (
             <TableRow key={user.id}>
               <TableCell>{user.email}</TableCell>
-              <TableCell>{user.is_admin ? 'Admin' : 'User'}</TableCell>
+              <TableCell>
+                <div className="flex flex-wrap gap-1">
+                  {userRoles(user.id).map((role) => (
+                    <Badge 
+                      key={role} 
+                      variant={
+                        role === 'admin' ? 'destructive' : 
+                        role === 'premium' ? 'default' : 'secondary'
+                      }
+                    >
+                      {role}
+                    </Badge>
+                  ))}
+                </div>
+              </TableCell>
               <TableCell>{new Date(user.created_at).toLocaleString()}</TableCell>
               <TableCell className="text-right space-x-2">
                 <Button 
