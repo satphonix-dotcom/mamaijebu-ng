@@ -11,8 +11,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const { updateProfileState, ...authState } = useAuthState();
   const authMethods = useAuthMethods(authState.user, updateProfileState);
 
-  // Implement the hasRole function here to access the current roles
+  // Fix the hasRole implementation to properly check the roles array
   const hasRole = (role: UserRole): boolean => {
+    console.log(`[AuthProvider] Checking for role ${role} in:`, authState.roles);
     return authState.roles.includes(role);
   };
 

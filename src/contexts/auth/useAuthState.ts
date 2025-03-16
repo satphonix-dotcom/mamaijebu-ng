@@ -19,26 +19,46 @@ export const useAuthState = (): AuthState & {
 
   // Function to update profile and roles state
   const updateProfileState = async (profileData: Profile | null) => {
+    console.log('[useAuthState] Updating profile state:', profileData);
+    
     if (profileData) {
       // Set profile first to ensure it's available
       setProfile(profileData);
       
       // Fetch user roles
       if (user) {
-        const userRoles = await fetchUserRoles(user.id);
-        setRoles(userRoles);
-        
-        // Set admin and premium states based on roles
-        setIsAdmin(userRoles.includes('admin'));
-        setIsPremium(userRoles.includes('premium'));
-        
-        console.log('[AuthContext] Updating profile state for:', profileData.email);
-        console.log('[AuthContext] User roles:', userRoles);
-        console.log('[AuthContext] Is admin:', userRoles.includes('admin'));
-        console.log('[AuthContext] Is premium:', userRoles.includes('premium'));
+        try {
+          const userRoles = await fetchUserRoles(user.id);
+          console.log('[useAuthState] Fetched roles for user:', userRoles);
+          
+          setRoles(userRoles);
+          
+          // Set admin and premium states based on roles
+          const hasAdminRole = userRoles.includes('admin');
+          const hasPremiumRole = userRoles.includes('premium');
+          
+          console.log('[useAuthState] Setting admin status to:', hasAdminRole);
+          console.log('[useAuthState] Setting premium status to:', hasPremiumRole);
+          
+          setIsAdmin(hasAdminRole);
+          setIsPremium(hasPremiumRole);
+          
+          // Also check legacy fields for backwards compatibility
+          if (!hasAdminRole && profileData.is_admin) {
+            console.log('[useAuthState] Setting admin from legacy field');
+            setIsAdmin(true);
+          }
+          
+          if (!hasPremiumRole && profileData.is_premium) {
+            console.log('[useAuthState] Setting premium from legacy field');
+            setIsPremium(true);
+          }
+        } catch (error) {
+          console.error('[useAuthState] Error fetching roles:', error);
+        }
       }
     } else {
-      console.log('[AuthContext] No profile data, resetting states');
+      console.log('[useAuthState] No profile data, resetting states');
       setProfile(null);
       setIsAdmin(false);
       setIsPremium(false);
@@ -50,22 +70,22 @@ export const useAuthState = (): AuthState & {
     const getSession = async () => {
       setIsLoading(true);
       try {
-        console.log('[AuthContext] Getting initial session');
+        console.log('[useAuthState] Getting initial session');
         const { data: { session }, error } = await supabase.auth.getSession();
         if (error) {
-          console.error('[AuthContext] Error getting session:', error);
+          console.error('[useAuthState] Error getting session:', error);
         } else {
           setSession(session);
           setUser(session?.user ?? null);
 
           if (session?.user) {
-            console.log('[AuthContext] Session found for user:', session.user.email);
+            console.log('[useAuthState] Session found for user:', session.user.email);
             const profileData = await fetchUserProfile(session.user.id);
             await updateProfileState(profileData);
           }
         }
       } catch (error) {
-        console.error('[AuthContext] Unexpected error:', error);
+        console.error('[useAuthState] Unexpected error:', error);
       } finally {
         setIsLoading(false);
       }
@@ -75,16 +95,16 @@ export const useAuthState = (): AuthState & {
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (_event, session) => {
-        console.log('[AuthContext] Auth state changed, event:', _event);
+        console.log('[useAuthState] Auth state changed, event:', _event);
         setSession(session);
         setUser(session?.user ?? null);
 
         if (session?.user) {
-          console.log('[AuthContext] User authenticated:', session.user.email);
+          console.log('[useAuthState] User authenticated:', session.user.email);
           const profileData = await fetchUserProfile(session.user.id);
           await updateProfileState(profileData);
         } else {
-          console.log('[AuthContext] User logged out or no session');
+          console.log('[useAuthState] User logged out or no session');
           await updateProfileState(null);
         }
       }
@@ -94,17 +114,6 @@ export const useAuthState = (): AuthState & {
       subscription.unsubscribe();
     };
   }, []);
-
-  // Extra debug information for admin status
-  useEffect(() => {
-    if (user) {
-      console.log('[AuthContext] Current state:');
-      console.log('- User:', user.email);
-      console.log('- isAdmin state:', isAdmin);
-      console.log('- isPremium state:', isPremium);
-      console.log('- Roles:', roles);
-    }
-  }, [user, isAdmin, isPremium, roles]);
 
   return {
     session,

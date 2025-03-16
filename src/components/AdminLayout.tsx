@@ -3,24 +3,46 @@ import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/components/ui/use-toast';
 
 export const AdminLayout = ({ children }: { children: React.ReactNode }) => {
-  const { isAdmin, isLoading, refreshUserProfile } = useAuth();
+  const { isAdmin, isLoading, refreshUserProfile, hasRole } = useAuth();
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   // Force refresh user profile when admin page loads
   useEffect(() => {
-    refreshUserProfile();
-    console.log('[AdminLayout] Refreshed user profile, isAdmin:', isAdmin);
+    console.log('[AdminLayout] Initial state - isAdmin:', isAdmin);
+    
+    const initialize = async () => {
+      console.log('[AdminLayout] Refreshing user profile...');
+      await refreshUserProfile();
+      console.log('[AdminLayout] Profile refreshed, isAdmin:', isAdmin);
+      
+      // Double-check with hasRole directly
+      const hasAdminRole = hasRole('admin');
+      console.log('[AdminLayout] hasRole("admin") returned:', hasAdminRole);
+    };
+    
+    initialize();
   }, [refreshUserProfile]);
 
   // Redirect if not admin
   useEffect(() => {
-    if (!isLoading && !isAdmin) {
-      console.log('[AdminLayout] User is not admin, redirecting to home');
-      navigate('/');
+    if (!isLoading) {
+      if (!isAdmin) {
+        console.log('[AdminLayout] User is not admin, redirecting to home');
+        toast({
+          title: "Access Denied",
+          description: "You don't have administrator privileges",
+          variant: "destructive"
+        });
+        navigate('/');
+      } else {
+        console.log('[AdminLayout] Admin access confirmed');
+      }
     }
-  }, [isAdmin, isLoading, navigate]);
+  }, [isAdmin, isLoading, navigate, toast]);
 
   if (isLoading) {
     return <div className="flex items-center justify-center h-screen">Loading...</div>;

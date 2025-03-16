@@ -17,6 +17,7 @@ export const NavLinks: React.FC<NavLinksProps> = ({ pathname, isAdmin, user }) =
     console.log('[NavLinks] Rendering with admin status:', isAdmin);
     console.log('[NavLinks] Admin status type:', typeof isAdmin);
     console.log('[NavLinks] User email:', user?.email);
+    
     if (isAdmin) {
       console.log('[NavLinks] ✅ Admin links should be visible for', user?.email);
     } else {
@@ -65,19 +66,16 @@ export const NavLinks: React.FC<NavLinksProps> = ({ pathname, isAdmin, user }) =
         </Link>
       )}
       {isAdmin && (
-        <>
-          <Link
-            to="/admin/dashboard"
-            className={cn(
-              "text-sm font-medium transition-colors hover:text-primary",
-              pathname.startsWith("/admin") ? "text-foreground" : "text-muted-foreground"
-            )}
-          >
-            Admin
-          </Link>
-          {/* For debugging - Remove this in production */}
-          <span className="text-xs text-green-500">Admin: {String(isAdmin)}</span>
-        </>
+        <Link
+          to="/admin/dashboard"
+          className={cn(
+            "text-sm font-medium transition-colors hover:text-primary flex items-center gap-2",
+            pathname.startsWith("/admin") ? "text-foreground" : "text-muted-foreground"
+          )}
+        >
+          <span>Admin</span>
+          <Badge variant="success" className="px-1.5 py-0 text-[10px]">Admin</Badge>
+        </Link>
       )}
     </nav>
   );
