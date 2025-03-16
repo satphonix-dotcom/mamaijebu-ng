@@ -11,6 +11,9 @@ interface NavLinksProps {
 }
 
 export const NavLinks: React.FC<NavLinksProps> = ({ pathname, isAdmin, user }) => {
+  // Debug admin status
+  console.log('NavLinks rendering - isAdmin:', isAdmin);
+  
   return (
     <nav className="hidden md:flex gap-6">
       <Link

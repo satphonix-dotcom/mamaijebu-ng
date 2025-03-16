@@ -1,3 +1,4 @@
+
 import { createContext, useContext, useEffect, useState } from 'react';
 import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -23,18 +24,21 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     if (profileData) {
       setProfile(profileData);
       const adminStatus = profileData.is_admin || false;
-      setIsAdmin(adminStatus);
-      setIsPremium(profileData.is_premium || false);
       
       // Enhanced logging for admin status
       console.log('User profile loaded:', profileData);
       console.log('Is admin:', adminStatus, typeof adminStatus);
       console.log('Is premium:', profileData.is_premium);
       
-      // Force refresh if admin status changes
+      // Set the admin status and force a re-render if it changes
       if (adminStatus !== isAdmin) {
         console.log('Admin status changed from', isAdmin, 'to', adminStatus);
+        setIsAdmin(adminStatus);
+      } else {
+        setIsAdmin(adminStatus); // Set it anyway to ensure consistency
       }
+      
+      setIsPremium(profileData.is_premium || false);
     } else {
       setProfile(null);
       setIsAdmin(false);

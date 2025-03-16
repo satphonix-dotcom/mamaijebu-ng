@@ -40,6 +40,9 @@ export const UserMenu: React.FC<UserMenuProps> = ({ user, isAdmin, isPremium, si
     );
   }
 
+  // Debug admin status
+  console.log('UserMenu rendering - isAdmin:', isAdmin, 'for user:', user.email);
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
