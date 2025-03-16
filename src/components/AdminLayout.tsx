@@ -27,7 +27,7 @@ export const AdminLayout = ({ children }: { children: React.ReactNode }) => {
     };
     
     initialize();
-  }, [refreshUserProfile, isAdmin, roles, hasRole]);
+  }, [refreshUserProfile]);
 
   // Use hasRole directly for more consistent role checking
   const isUserAdmin = hasRole('admin');

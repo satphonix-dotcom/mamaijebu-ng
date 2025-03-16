@@ -25,32 +25,45 @@ export const useAuthState = (): AuthState & {
       // Set profile first to ensure it's available
       setProfile(profileData);
       
-      // Fetch user roles
+      let userRoles: UserRole[] = [];
+      
+      // Set admin and premium states based on legacy fields first
+      if (profileData.is_admin) {
+        console.log('[useAuthState] Setting admin from profile.is_admin field');
+        setIsAdmin(true);
+        // Add admin role if it's not already in the roles array
+        if (!userRoles.includes('admin')) {
+          userRoles.push('admin');
+        }
+      }
+      
+      if (profileData.is_premium) {
+        console.log('[useAuthState] Setting premium from profile.is_premium field');
+        setIsPremium(true);
+        // Add premium role if it's not already in the roles array
+        if (!userRoles.includes('premium')) {
+          userRoles.push('premium');
+        }
+      }
+      
+      // Fetch user roles from the new roles system
       if (user) {
         try {
-          const userRoles = await fetchUserRoles(user.id);
-          console.log('[useAuthState] Fetched roles for user:', userRoles);
+          const fetchedRoles = await fetchUserRoles(user.id);
+          console.log('[useAuthState] Fetched roles for user:', fetchedRoles);
           
+          // Merge with any roles already set from legacy fields
+          userRoles = [...new Set([...userRoles, ...fetchedRoles])];
           setRoles(userRoles);
           
-          // Set admin and premium states based on roles
-          const hasAdminRole = userRoles.includes('admin');
-          const hasPremiumRole = userRoles.includes('premium');
-          
-          console.log('[useAuthState] Setting admin status to:', hasAdminRole);
-          console.log('[useAuthState] Setting premium status to:', hasPremiumRole);
-          
-          setIsAdmin(hasAdminRole);
-          setIsPremium(hasPremiumRole);
-          
-          // Also check legacy fields for backwards compatibility
-          if (!hasAdminRole && profileData.is_admin) {
-            console.log('[useAuthState] Setting admin from legacy field');
+          // Update admin and premium states based on roles
+          if (userRoles.includes('admin') && !isAdmin) {
+            console.log('[useAuthState] Setting admin status from roles');
             setIsAdmin(true);
           }
           
-          if (!hasPremiumRole && profileData.is_premium) {
-            console.log('[useAuthState] Setting premium from legacy field');
+          if (userRoles.includes('premium') && !isPremium) {
+            console.log('[useAuthState] Setting premium status from roles');
             setIsPremium(true);
           }
         } catch (error) {

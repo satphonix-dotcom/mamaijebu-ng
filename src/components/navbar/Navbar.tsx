@@ -35,7 +35,13 @@ const Navbar = () => {
       <div className="container flex h-16 items-center justify-between py-4">
         <div className="flex gap-6 md:gap-10">
           <BrandLogo />
-          <NavLinks pathname={pathname} isAdmin={adminStatus} user={user} />
+          <NavLinks 
+            pathname={pathname} 
+            isAdmin={adminStatus} 
+            user={user} 
+            hasRole={hasRole} 
+            roles={roles} 
+          />
         </div>
         
         <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>

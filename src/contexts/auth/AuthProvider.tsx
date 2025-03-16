@@ -1,5 +1,5 @@
 
-import React, { createContext, useContext } from 'react';
+import React, { createContext, useContext, useEffect } from 'react';
 import { useAuthState } from './useAuthState';
 import { useAuthMethods } from './useAuthMethods';
 import { AuthContextType, AuthState } from './types';
@@ -14,8 +14,22 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   // Implement hasRole directly in the provider to use the actual state
   const hasRole = (role: UserRole): boolean => {
     console.log(`[AuthProvider] Checking for role ${role} in:`, authState.roles);
+    if (role === 'admin' && authState.isAdmin) {
+      console.log('[AuthProvider] User has admin role from isAdmin flag');
+      return true;
+    }
+    if (role === 'premium' && authState.isPremium) {
+      console.log('[AuthProvider] User has premium role from isPremium flag');
+      return true;
+    }
     return authState.roles.includes(role);
   };
+
+  // Debug roles on mount or when they change
+  useEffect(() => {
+    console.log('[AuthProvider] Current roles:', authState.roles);
+    console.log('[AuthProvider] Is admin from state:', authState.isAdmin);
+  }, [authState.roles, authState.isAdmin]);
 
   return (
     <AuthContext.Provider

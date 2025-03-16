@@ -12,7 +12,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useAuth } from "@/contexts/auth";
 
 interface UserMenuProps {
   user: User | null;
@@ -22,8 +21,6 @@ interface UserMenuProps {
 }
 
 export const UserMenu: React.FC<UserMenuProps> = ({ user, isAdmin, isPremium, signOut }) => {
-  const { hasRole, roles } = useAuth();
-  
   // Handle sign out with proper error handling
   const handleSignOut = async () => {
     try {
@@ -43,12 +40,8 @@ export const UserMenu: React.FC<UserMenuProps> = ({ user, isAdmin, isPremium, si
     );
   }
 
-  // Double check admin status
-  const userIsAdmin = hasRole('admin');
-  
   // Debug admin status
-  console.log('UserMenu rendering - isAdmin:', isAdmin, 'hasRole check:', userIsAdmin);
-  console.log('UserMenu roles available:', roles);
+  console.log('UserMenu rendering - isAdmin:', isAdmin);
   console.log('UserMenu user:', user.email);
 
   return (
@@ -68,7 +61,7 @@ export const UserMenu: React.FC<UserMenuProps> = ({ user, isAdmin, isPremium, si
           <div className="flex flex-col space-y-1">
             <p className="text-sm font-medium leading-none">{user?.email}</p>
             <p className="text-xs leading-none text-muted-foreground">
-              {userIsAdmin ? "Administrator" : isPremium ? "Premium User" : "User"}
+              {isAdmin ? "Administrator" : isPremium ? "Premium User" : "User"}
             </p>
           </div>
         </DropdownMenuLabel>
@@ -81,7 +74,7 @@ export const UserMenu: React.FC<UserMenuProps> = ({ user, isAdmin, isPremium, si
             <Link to="/premium">Upgrade to Premium</Link>
           </DropdownMenuItem>
         )}
-        {userIsAdmin && (
+        {isAdmin && (
           <DropdownMenuItem asChild>
             <Link to="/admin/dashboard">Admin Dashboard</Link>
           </DropdownMenuItem>
