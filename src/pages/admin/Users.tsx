@@ -76,13 +76,17 @@ const Users = () => {
         <DeleteUserDialog 
           isOpen={isDeleteDialogOpen} 
           onOpenChange={setIsDeleteDialogOpen} 
-          onDelete={handleDeleteUser} 
+          onConfirm={handleDeleteUser}
+          onCancel={() => setIsDeleteDialogOpen(false)}
         />
 
         <CreateUserDialog 
           isOpen={isCreateDialogOpen} 
           onOpenChange={setIsCreateDialogOpen}
-          onUserCreated={() => fetchUsers()}
+          onSave={async (userData) => {
+            await fetchUsers();
+            setIsCreateDialogOpen(false);
+          }}
         />
       </div>
     </AdminLayout>
