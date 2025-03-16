@@ -10,7 +10,7 @@ import PremiumSubscription from '@/pages/PremiumSubscription';
 import PremiumConfirmation from '@/pages/PremiumConfirmation';
 import GameSearch from '@/pages/GameSearch';
 import NotFound from '@/pages/NotFound';
-import { AuthProvider } from '@/contexts/AuthContext';
+import { AuthProvider } from '@/contexts/auth';
 import { Toaster } from '@/components/ui/toaster';
 import AdminDashboard from '@/pages/admin/AdminDashboard';
 import AdminGames from '@/pages/admin/Games';
