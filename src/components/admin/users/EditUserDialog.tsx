@@ -23,8 +23,10 @@ export function EditUserDialog({ isOpen, onOpenChange, user, onSave }: EditUserD
   useEffect(() => {
     if (user) {
       setEmail(user.email);
-      setIsAdmin(user.is_admin || false);
-      console.log('EditUserDialog - Loading user:', user.email, 'Admin status:', user.is_admin);
+      // Ensure boolean conversion for is_admin
+      const adminStatus = user.is_admin === true;
+      setIsAdmin(adminStatus);
+      console.log('EditUserDialog - Loading user:', user.email, 'Admin status:', adminStatus, 'Raw value:', user.is_admin);
     }
   }, [user]);
 
@@ -39,6 +41,9 @@ export function EditUserDialog({ isOpen, onOpenChange, user, onSave }: EditUserD
         email,
         is_admin: isAdmin,
       });
+      console.log('User saved successfully with admin status:', isAdmin);
+    } catch (error) {
+      console.error('Error saving user:', error);
     } finally {
       setIsSaving(false);
     }
@@ -70,7 +75,11 @@ export function EditUserDialog({ isOpen, onOpenChange, user, onSave }: EditUserD
               <Checkbox
                 id="isAdmin"
                 checked={isAdmin}
-                onCheckedChange={(checked) => setIsAdmin(checked === true)}
+                onCheckedChange={(checked) => {
+                  const newValue = checked === true;
+                  console.log('Checkbox changed to:', newValue);
+                  setIsAdmin(newValue);
+                }}
               />
               <Label htmlFor="isAdmin" className="font-normal">
                 User has admin privileges

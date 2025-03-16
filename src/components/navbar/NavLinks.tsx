@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { User } from "@supabase/supabase-js";
 import { cn } from "@/lib/utils";
@@ -11,8 +11,13 @@ interface NavLinksProps {
 }
 
 export const NavLinks: React.FC<NavLinksProps> = ({ pathname, isAdmin, user }) => {
-  // Debug admin status
-  console.log('NavLinks rendering - isAdmin:', isAdmin);
+  // Enhanced debug for admin status
+  useEffect(() => {
+    console.log('NavLinks - Admin status check:', isAdmin);
+    if (isAdmin) {
+      console.log('Admin links should be visible');
+    }
+  }, [isAdmin]);
   
   return (
     <nav className="hidden md:flex gap-6">

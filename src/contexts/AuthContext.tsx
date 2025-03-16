@@ -20,26 +20,27 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const { signIn, signUp, signOut: authSignOut, upgradeToPremium: upgradeUserToPremium } = useAuthOperations();
 
   // Function to update profile state
-  const updateProfileState = (profileData: Profile | null) => {
+  const updateProfileState = async (profileData: Profile | null) => {
     if (profileData) {
+      // Set profile first to ensure it's available
       setProfile(profileData);
-      const adminStatus = profileData.is_admin || false;
       
-      // Enhanced logging for admin status
-      console.log('User profile loaded:', profileData);
-      console.log('Is admin:', adminStatus, typeof adminStatus);
-      console.log('Is premium:', profileData.is_premium);
+      // Parse admin status with explicit boolean conversion and debug logging
+      const adminStatus = profileData.is_admin === true;
+      const premiumStatus = profileData.is_premium === true;
       
-      // Set the admin status and force a re-render if it changes
-      if (adminStatus !== isAdmin) {
-        console.log('Admin status changed from', isAdmin, 'to', adminStatus);
-        setIsAdmin(adminStatus);
-      } else {
-        setIsAdmin(adminStatus); // Set it anyway to ensure consistency
-      }
+      console.log('Updating profile state for:', profileData.email);
+      console.log('Raw admin value:', profileData.is_admin);
+      console.log('Parsed admin status:', adminStatus);
+      console.log('Current admin state:', isAdmin);
       
-      setIsPremium(profileData.is_premium || false);
+      // Set the admin and premium statuses
+      setIsAdmin(adminStatus);
+      setIsPremium(premiumStatus);
+      
+      console.log('Admin status set to:', adminStatus);
     } else {
+      console.log('No profile data, resetting states');
       setProfile(null);
       setIsAdmin(false);
       setIsPremium(false);
@@ -61,7 +62,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           if (session?.user) {
             console.log('Session found for user:', session.user.email);
             const profileData = await fetchUserProfile(session.user.id);
-            updateProfileState(profileData);
+            await updateProfileState(profileData);
           }
         }
       } catch (error) {
@@ -82,10 +83,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         if (session?.user) {
           console.log('User authenticated:', session.user.email);
           const profileData = await fetchUserProfile(session.user.id);
-          updateProfileState(profileData);
+          await updateProfileState(profileData);
         } else {
           console.log('User logged out or no session');
-          updateProfileState(null);
+          await updateProfileState(null);
         }
       }
     );
@@ -103,7 +104,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       // Clear all auth state first to prevent UI flicker
       setSession(null);
       setUser(null);
-      updateProfileState(null);
+      await updateProfileState(null);
       
       // Then call the actual signOut from supabase
       await authSignOut();
@@ -126,7 +127,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     if (success) {
       // Update local state
       const updatedProfile = await fetchUserProfile(user.id);
-      updateProfileState(updatedProfile);
+      await updateProfileState(updatedProfile);
     }
     
     return success;
