@@ -11,7 +11,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const { updateProfileState, ...authState } = useAuthState();
   const authMethods = useAuthMethods(authState.user, updateProfileState);
 
-  // Fix the hasRole implementation to properly check the roles array
+  // Implement hasRole directly in the provider to use the actual state
   const hasRole = (role: UserRole): boolean => {
     console.log(`[AuthProvider] Checking for role ${role} in:`, authState.roles);
     return authState.roles.includes(role);
@@ -22,6 +22,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       value={{
         ...authState,
         ...authMethods,
+        // Override the hasRole from authMethods with our implementation
         hasRole
       }}
     >

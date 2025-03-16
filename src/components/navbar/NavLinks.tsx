@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { User } from "@supabase/supabase-js";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
+import { useAuth } from "@/contexts/auth";
 
 interface NavLinksProps {
   pathname: string;
@@ -17,6 +18,12 @@ export const NavLinks: React.FC<NavLinksProps> = ({ pathname, isAdmin, user }) =
     console.log('[NavLinks] Rendering with admin status:', isAdmin);
     console.log('[NavLinks] Admin status type:', typeof isAdmin);
     console.log('[NavLinks] User email:', user?.email);
+    
+    const { hasRole, roles } = useAuth();
+    const adminCheck = hasRole('admin');
+    
+    console.log('[NavLinks] Direct hasRole check:', adminCheck);
+    console.log('[NavLinks] Available roles:', roles);
     
     if (isAdmin) {
       console.log('[NavLinks] ✅ Admin links should be visible for', user?.email);

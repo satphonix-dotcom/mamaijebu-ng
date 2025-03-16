@@ -2,22 +2,24 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/contexts/auth';
 import { useToast } from '@/components/ui/use-toast';
 
 export const AdminLayout = ({ children }: { children: React.ReactNode }) => {
-  const { isAdmin, isLoading, refreshUserProfile, hasRole } = useAuth();
+  const { isAdmin, isLoading, refreshUserProfile, hasRole, roles } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
   // Force refresh user profile when admin page loads
   useEffect(() => {
     console.log('[AdminLayout] Initial state - isAdmin:', isAdmin);
+    console.log('[AdminLayout] Initial state - roles:', roles);
     
     const initialize = async () => {
       console.log('[AdminLayout] Refreshing user profile...');
       await refreshUserProfile();
       console.log('[AdminLayout] Profile refreshed, isAdmin:', isAdmin);
+      console.log('[AdminLayout] Profile refreshed, roles:', roles);
       
       // Double-check with hasRole directly
       const hasAdminRole = hasRole('admin');
@@ -25,12 +27,15 @@ export const AdminLayout = ({ children }: { children: React.ReactNode }) => {
     };
     
     initialize();
-  }, [refreshUserProfile]);
+  }, [refreshUserProfile, isAdmin, roles, hasRole]);
+
+  // Use hasRole directly for more consistent role checking
+  const isUserAdmin = hasRole('admin');
 
   // Redirect if not admin
   useEffect(() => {
     if (!isLoading) {
-      if (!isAdmin) {
+      if (!isUserAdmin) {
         console.log('[AdminLayout] User is not admin, redirecting to home');
         toast({
           title: "Access Denied",
@@ -42,13 +47,13 @@ export const AdminLayout = ({ children }: { children: React.ReactNode }) => {
         console.log('[AdminLayout] Admin access confirmed');
       }
     }
-  }, [isAdmin, isLoading, navigate, toast]);
+  }, [isUserAdmin, isLoading, navigate, toast]);
 
   if (isLoading) {
     return <div className="flex items-center justify-center h-screen">Loading...</div>;
   }
 
-  if (!isAdmin) {
+  if (!isUserAdmin) {
     return null;
   }
 

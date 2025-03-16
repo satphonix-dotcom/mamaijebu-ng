@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/contexts/auth";
 import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetTrigger } from "@/components/ui/sheet";
@@ -11,7 +11,7 @@ import { UserMenu } from "./UserMenu";
 import { BrandLogo } from "./BrandLogo";
 
 const Navbar = () => {
-  const { user, signOut, isAdmin, isPremium, refreshUserProfile } = useAuth();
+  const { user, signOut, isAdmin, isPremium, refreshUserProfile, hasRole, roles } = useAuth();
   const { pathname } = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   
@@ -20,18 +20,22 @@ const Navbar = () => {
     if (user) {
       console.log('[Navbar] User logged in:', user.email);
       console.log('[Navbar] Is admin:', isAdmin, 'Type:', typeof isAdmin);
+      console.log('[Navbar] Direct hasRole check:', hasRole('admin'));
+      console.log('[Navbar] Available roles:', roles);
       
       // Force refresh user profile on component mount
       refreshUserProfile();
     }
-  }, [user, isAdmin, refreshUserProfile]);
+  }, [user, isAdmin, refreshUserProfile, hasRole, roles]);
+
+  const adminStatus = hasRole('admin'); // Directly use hasRole for consistency
 
   return (
     <header className="bg-background border-b sticky top-0 z-30">
       <div className="container flex h-16 items-center justify-between py-4">
         <div className="flex gap-6 md:gap-10">
           <BrandLogo />
-          <NavLinks pathname={pathname} isAdmin={isAdmin} user={user} />
+          <NavLinks pathname={pathname} isAdmin={adminStatus} user={user} />
         </div>
         
         <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
@@ -49,7 +53,7 @@ const Navbar = () => {
             </SheetHeader>
             <MobileNavLinks 
               pathname={pathname} 
-              isAdmin={isAdmin} 
+              isAdmin={adminStatus} 
               isPremium={isPremium} 
               user={user} 
               setIsMobileMenuOpen={setIsMobileMenuOpen} 
@@ -57,7 +61,7 @@ const Navbar = () => {
           </SheetContent>
         </Sheet>
 
-        <UserMenu user={user} isAdmin={isAdmin} isPremium={isPremium} signOut={signOut} />
+        <UserMenu user={user} isAdmin={adminStatus} isPremium={isPremium} signOut={signOut} />
       </div>
     </header>
   );
