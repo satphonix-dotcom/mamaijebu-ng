@@ -15,20 +15,22 @@ const Navbar = () => {
   const { pathname } = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   
-  // Log admin status for debugging
+  // On mount, refresh the user profile to ensure we have the latest data
   useEffect(() => {
     if (user) {
       console.log('[Navbar] User logged in:', user.email);
-      console.log('[Navbar] Is admin:', isAdmin, 'Type:', typeof isAdmin);
-      console.log('[Navbar] Direct hasRole check:', hasRole('admin'));
+      console.log('[Navbar] Is admin:', isAdmin);
+      console.log('[Navbar] Has admin role:', hasRole('admin'));
       console.log('[Navbar] Available roles:', roles);
       
       // Force refresh user profile on component mount
       refreshUserProfile();
     }
-  }, [user, isAdmin, refreshUserProfile, hasRole, roles]);
+  }, [user, refreshUserProfile]);
 
-  const adminStatus = hasRole('admin'); // Directly use hasRole for consistency
+  // Make sure we use hasRole consistently
+  const isUserAdmin = hasRole('admin');
+  const isUserPremium = hasRole('premium');
 
   return (
     <header className="bg-background border-b sticky top-0 z-30">
@@ -37,10 +39,8 @@ const Navbar = () => {
           <BrandLogo />
           <NavLinks 
             pathname={pathname} 
-            isAdmin={adminStatus} 
+            isAdmin={isUserAdmin} 
             user={user} 
-            hasRole={hasRole} 
-            roles={roles} 
           />
         </div>
         
@@ -59,15 +59,15 @@ const Navbar = () => {
             </SheetHeader>
             <MobileNavLinks 
               pathname={pathname} 
-              isAdmin={adminStatus} 
-              isPremium={isPremium} 
+              isAdmin={isUserAdmin} 
+              isPremium={isUserPremium} 
               user={user} 
               setIsMobileMenuOpen={setIsMobileMenuOpen} 
             />
           </SheetContent>
         </Sheet>
 
-        <UserMenu user={user} isAdmin={adminStatus} isPremium={isPremium} signOut={signOut} />
+        <UserMenu user={user} isAdmin={isUserAdmin} isPremium={isUserPremium} signOut={signOut} />
       </div>
     </header>
   );

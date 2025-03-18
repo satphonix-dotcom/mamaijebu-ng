@@ -1,37 +1,19 @@
 
-import React, { useEffect } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 import { User } from "@supabase/supabase-js";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
-import { AuthContextType } from "@/contexts/auth/types";
 
 interface NavLinksProps {
   pathname: string;
   isAdmin: boolean;
   user: User | null;
-  hasRole: AuthContextType['hasRole'];
-  roles: string[];
 }
 
-export const NavLinks: React.FC<NavLinksProps> = ({ pathname, isAdmin, user, hasRole, roles }) => {
-  // Debug for admin status
-  useEffect(() => {
-    console.log('[NavLinks] Rendering with admin status:', isAdmin);
-    console.log('[NavLinks] Admin status type:', typeof isAdmin);
-    console.log('[NavLinks] User email:', user?.email);
-    
-    const adminCheck = hasRole('admin');
-    
-    console.log('[NavLinks] Direct hasRole check:', adminCheck);
-    console.log('[NavLinks] Available roles:', roles);
-    
-    if (isAdmin) {
-      console.log('[NavLinks] ✅ Admin links should be visible for', user?.email);
-    } else {
-      console.log('[NavLinks] ❌ Admin links hidden for', user?.email);
-    }
-  }, [isAdmin, user, hasRole, roles]);
+export const NavLinks: React.FC<NavLinksProps> = ({ pathname, isAdmin, user }) => {
+  // Simple debug log
+  console.log('[NavLinks] Rendering with admin status:', isAdmin);
   
   return (
     <nav className="hidden md:flex gap-6">

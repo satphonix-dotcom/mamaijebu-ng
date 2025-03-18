@@ -6,31 +6,25 @@ import { useAuth } from '@/contexts/auth';
 import { useToast } from '@/components/ui/use-toast';
 
 export const AdminLayout = ({ children }: { children: React.ReactNode }) => {
-  const { isAdmin, isLoading, refreshUserProfile, hasRole, roles } = useAuth();
+  const { isLoading, refreshUserProfile, hasRole } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  // Check if user has admin role
+  const isUserAdmin = hasRole('admin');
+
   // Force refresh user profile when admin page loads
   useEffect(() => {
-    console.log('[AdminLayout] Initial state - isAdmin:', isAdmin);
-    console.log('[AdminLayout] Initial state - roles:', roles);
+    console.log('[AdminLayout] Initial state - admin check:', isUserAdmin);
     
     const initialize = async () => {
       console.log('[AdminLayout] Refreshing user profile...');
       await refreshUserProfile();
-      console.log('[AdminLayout] Profile refreshed, isAdmin:', isAdmin);
-      console.log('[AdminLayout] Profile refreshed, roles:', roles);
-      
-      // Double-check with hasRole directly
-      const hasAdminRole = hasRole('admin');
-      console.log('[AdminLayout] hasRole("admin") returned:', hasAdminRole);
+      console.log('[AdminLayout] Profile refreshed, admin check:', hasRole('admin'));
     };
     
     initialize();
   }, [refreshUserProfile]);
-
-  // Use hasRole directly for more consistent role checking
-  const isUserAdmin = hasRole('admin');
 
   // Redirect if not admin
   useEffect(() => {
