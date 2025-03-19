@@ -53,15 +53,18 @@ export const useAuthMethods = (
     try {
       console.log('[AuthContext] Starting sign out process');
       
-      // Then call the actual signOut from supabase
+      // Call the actual signOut from supabase
       await authSignOut();
-      console.log('[AuthContext] Sign out completed, redirecting to home page');
+      console.log('[AuthContext] Sign out completed');
+      
+      // Reset local state
+      await updateProfileState(null);
       
       // Force a page reload to ensure all state is cleared
       window.location.href = '/';
     } catch (error) {
       console.error('[AuthContext] Error during sign out:', error);
-      throw error; // Rethrow to allow proper error handling
+      throw error;
     }
   };
 
