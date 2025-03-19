@@ -1,5 +1,6 @@
 
-import React, { createContext, useContext, useEffect } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuthState } from './useAuthState';
 import { useAuthMethods } from './useAuthMethods';
 import { AuthContextType } from './types';
@@ -10,6 +11,9 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const { updateProfileState, ...authState } = useAuthState();
   const authMethods = useAuthMethods(authState.user, updateProfileState);
+  const [authInitialized, setAuthInitialized] = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
 
   // Create a robust hasRole implementation that checks both roles array and legacy flags
   const hasRole = (role: UserRole): boolean => {
@@ -34,11 +38,31 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return hasRoleInArray;
   };
 
+  // Initialize auth state and handle route protection
   useEffect(() => {
-    console.log('[AuthProvider] Mounted with roles:', authState.roles);
-    console.log('[AuthProvider] Admin status:', authState.isAdmin);
-    console.log('[AuthProvider] User:', authState.user?.email);
-  }, [authState.roles, authState.isAdmin, authState.user]);
+    const initializeAuth = async () => {
+      if (!authState.isLoading && !authInitialized) {
+        console.log('[AuthProvider] Auth initialized with roles:', authState.roles);
+        console.log('[AuthProvider] Admin status:', authState.isAdmin);
+        console.log('[AuthProvider] User:', authState.user?.email);
+        setAuthInitialized(true);
+      }
+    };
+    
+    initializeAuth();
+  }, [authState.isLoading, authState.roles, authState.isAdmin, authState.user, authInitialized]);
+
+  // Route protection effect
+  useEffect(() => {
+    // Check if auth is ready before applying route protection
+    if (!authState.isLoading && authInitialized) {
+      // Protect admin routes
+      if (location.pathname.startsWith('/admin') && !hasRole('admin')) {
+        console.log('[AuthProvider] Unauthorized access to admin route, redirecting');
+        navigate('/');
+      }
+    }
+  }, [location.pathname, hasRole, authState.isLoading, authInitialized, navigate]);
 
   // Create a single merged context value
   const contextValue: AuthContextType = {

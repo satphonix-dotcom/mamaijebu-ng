@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/auth";
 import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -11,22 +11,22 @@ import { UserMenu } from "./UserMenu";
 import { BrandLogo } from "./BrandLogo";
 
 const Navbar = () => {
-  const { user, signOut, isAdmin, isPremium, refreshUserProfile, hasRole, roles } = useAuth();
+  const { user, signOut, refreshUserProfile, hasRole, roles } = useAuth();
   const { pathname } = useLocation();
+  const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   
   // On mount, refresh the user profile to ensure we have the latest data
   useEffect(() => {
     if (user) {
       console.log('[Navbar] User logged in:', user.email);
-      console.log('[Navbar] Is admin:', isAdmin);
       console.log('[Navbar] Has admin role:', hasRole('admin'));
       console.log('[Navbar] Available roles:', roles);
       
       // Force refresh user profile on component mount
       refreshUserProfile();
     }
-  }, [user, refreshUserProfile]);
+  }, [user, refreshUserProfile, hasRole, roles]);
 
   // Make sure we use hasRole consistently
   const isUserAdmin = hasRole('admin');

@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { User } from "@supabase/supabase-js";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -23,17 +23,22 @@ interface UserMenuProps {
 
 export const UserMenu: React.FC<UserMenuProps> = ({ user, isAdmin, isPremium, signOut }) => {
   const { toast } = useToast();
+  const navigate = useNavigate();
   
-  // Handle sign out with proper error handling
+  // Enhanced sign out with proper navigation
   const handleSignOut = async () => {
     try {
       console.log("Signing out user...");
       await signOut();
       console.log("User signed out successfully");
+      
       toast({
         title: "Signed out",
         description: "You have been signed out successfully.",
       });
+      
+      // Use React Router navigation instead of window.location for better SPA behavior
+      navigate('/', { replace: true });
     } catch (error) {
       console.error("Error signing out:", error);
       toast({

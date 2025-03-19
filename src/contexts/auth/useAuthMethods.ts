@@ -47,22 +47,21 @@ export const useAuthMethods = (
     }
   };
 
-  // Wrapper for signOut to reset local state
+  // Improved signOut to ensure clean logout
   const handleSignOut = async () => {
     try {
       console.log('[AuthContext] Starting sign out process');
       
-      // First reset local state
+      // First reset local state to prevent any state-related issues
       await updateProfileState(null);
       
       // Then call the actual signOut from supabase
       await authSignOut();
       console.log('[AuthContext] Sign out completed');
       
-      // Force a page reload to ensure all state is cleared
-      window.location.href = '/';
-      
-      return;
+      // Use a more reliable approach than forced navigation
+      // This allows React Router to handle the navigation
+      return true;
     } catch (error) {
       console.error('[AuthContext] Error during sign out:', error);
       throw error;
