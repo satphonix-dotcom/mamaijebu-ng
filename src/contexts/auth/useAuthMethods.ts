@@ -1,4 +1,3 @@
-
 import { User } from '@supabase/supabase-js';
 import { useAuthOperations } from '@/hooks/useAuthOperations';
 import { fetchUserProfile, fetchUserRoles, addUserRole, removeUserRole } from '@/hooks/useUserProfile';
@@ -53,15 +52,17 @@ export const useAuthMethods = (
     try {
       console.log('[AuthContext] Starting sign out process');
       
-      // Call the actual signOut from supabase
+      // First reset local state
+      await updateProfileState(null);
+      
+      // Then call the actual signOut from supabase
       await authSignOut();
       console.log('[AuthContext] Sign out completed');
       
-      // Reset local state
-      await updateProfileState(null);
-      
       // Force a page reload to ensure all state is cleared
       window.location.href = '/';
+      
+      return;
     } catch (error) {
       console.error('[AuthContext] Error during sign out:', error);
       throw error;

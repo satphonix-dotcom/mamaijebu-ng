@@ -35,15 +35,17 @@ export const useAuthOperations = () => {
   const signOut = async () => {
     try {
       console.log('useAuthOperations: Calling Supabase signOut');
+      
+      // First, properly clear session from browser
+      localStorage.removeItem('supabase.auth.token');
+      
+      // Then perform the API call to sign out
       const { error } = await supabase.auth.signOut();
       if (error) {
         console.error('Supabase signOut error:', error);
         throw error;
       }
       console.log('useAuthOperations: Supabase signOut successful');
-      
-      // Force clear auth state from localStorage
-      localStorage.removeItem('supabase.auth.token');
       
       return { success: true };
     } catch (error) {
